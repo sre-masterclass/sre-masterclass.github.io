@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latency Impact Simulator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+            margin: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 8px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .scenario {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px 20px;
+            margin: 15px 20px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .scenario h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .scenario p {
+            color: #34495e;
+            line-height: 1.4;
+            font-size: 0.95em;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 0 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .panel h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .latency-display {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .latency-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+
+        .latency-status {
+            font-size: 1.1em;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .status-good {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-critical {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .business-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .metric {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #3498db;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .metric.warning {
+            border-left-color: #f39c12;
+            background: #fefcf3;
+        }
+
+        .metric.critical {
+            border-left-color: #e74c3c;
+            background: #fdf2f2;
+        }
+
+        .metric-label {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 180px;
+            margin-top: 10px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .step-info {
+            background: #ecf0f1;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #2c3e50;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .controls {
+            text-align: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            flex-shrink: 0;
+        }
+
+        .control-group {
+            margin-bottom: 12px;
+        }
+
+        .control-group h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            cursor: pointer;
+            margin: 0 6px 6px 0;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            min-width: 110px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn.active {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+
+        .btn.reset {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        }
+
+        .btn.reset:hover {
+            box-shadow: 0 3px 12px rgba(149, 165, 166, 0.3);
+        }
+
+        .impact-summary {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .impact-summary h3 {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .impact-summary p {
+            font-size: 0.95em;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .impact-summary p:last-child {
+            margin-bottom: 0;
+        }
+
+        .revenue-impact {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #e74c3c;
+            margin: 0 4px;
+        }
+
+        /* Ensure no scrollbars on 1920x1080 */
+        @media (min-width: 1920px) and (min-height: 1080px) {
+            body {
+                padding: 0;
+            }
+            
+            .container {
+                margin: 10px;
+                height: calc(100vh - 20px);
+                max-width: 1900px;
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .business-metrics {
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+            }
+
+            .btn {
+                display: inline-block;
+                margin: 4px;
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Latency Impact Simulator</h1>
+            <p>See how response time directly affects your bottom line</p>
+        </div>
+
+        <div class="scenario">
+            <h3>Scenario: E-commerce During Peak Traffic</h3>
+            <p>Your online store normally responds in 200ms. A database issue is causing gradual slowdown. Click each step to see how latency impacts business metrics.</p>
+        </div>
+
+        <div class="dashboard">
+            <div class="panel">
+                <h2>System Response Time</h2>
+                <div class="latency-display">
+                    <div class="latency-value" id="current-latency">200ms</div>
+                    <div class="latency-status status-good" id="latency-status">Fast</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="latencyChart"></canvas>
+                </div>
+                <div class="step-info" id="step-info">
+                    Click a latency level below to see the business impact
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Business Impact</h2>
+                <div class="business-metrics">
+                    <div class="metric" id="conversion-metric">
+                        <div class="metric-label">Conversion Rate</div>
+                        <div class="metric-value" id="conversion-value">3.2%</div>
+                    </div>
+                    <div class="metric" id="revenue-metric">
+                        <div class="metric-label">Revenue/Minute</div>
+                        <div class="metric-value" id="revenue-value">$2,400</div>
+                    </div>
+                    <div class="metric" id="abandonment-metric">
+                        <div class="metric-label">Cart Abandonment</div>
+                        <div class="metric-value" id="abandonment-value">68%</div>
+                    </div>
+                    <div class="metric" id="satisfaction-metric">
+                        <div class="metric-label">Customer Rating</div>
+                        <div class="metric-value" id="satisfaction-value">4.2★</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <h3>Click to Set Latency Level</h3>
+                <button class="btn active" id="btn-200" onclick="setLatency(200, 'btn-200')">200ms - Fast</button>
+                <button class="btn" id="btn-500" onclick="setLatency(500, 'btn-500')">500ms - Acceptable</button>
+                <button class="btn" id="btn-1000" onclick="setLatency(1000, 'btn-1000')">1 sec - Slow</button>
+                <button class="btn" id="btn-2000" onclick="setLatency(2000, 'btn-2000')">2 sec - Very Slow</button>
+                <button class="btn" id="btn-4000" onclick="setLatency(4000, 'btn-4000')">4 sec - Critical</button>
+                <button class="btn reset" onclick="resetSimulation()">Reset</button>
+            </div>
+        </div>
+
+        <div class="impact-summary">
+            <h3>The Business Reality</h3>
+            <p>Every 100ms of additional latency can reduce conversion rates by 1%. A 1-second delay can cost a typical e-commerce site <span class="revenue-impact">$100,000+ per hour</span> in lost revenue.</p>
+            <p><strong>This is why latency isn't just a technical metric—it's a business KPI.</strong></p>
+        </div>
+    </div>
+
+    <script>
+        let latencyChart;
+
+        // Latency levels with descriptions
+        const latencyLevels = {
+            200: { status: 'Fast', class: 'status-good', description: 'Optimal performance - customers are happy' },
+            500: { status: 'Acceptable', class: 'status-good', description: 'Still acceptable - minor impact on conversions' },
+            1000: { status: 'Slow', class: 'status-warning', description: 'Users notice the delay - conversions dropping' },
+            2000: { status: 'Very Slow', class: 'status-warning', description: 'Significant user frustration - major revenue loss' },
+            4000: { status: 'Critical', class: 'status-critical', description: 'Users abandoning - business impact severe' }
+        };
+
+        // Business impact calculation
+        function calculateBusinessImpact(latency) {
+            const baseConversion = 3.2;
+            const baseRevenue = 2400;
+            const baseAbandonment = 68;
+            const baseSatisfaction = 4.2;
+
+            // Research-based impact calculation
+            let impactFactor = 1;
+            if (latency > 200) {
+                // Every 100ms reduces conversion by ~1%
+                impactFactor = Math.max(0.25, 1 - ((latency - 200) / 10000));
+            }
+
+            return {
+                conversion: (baseConversion * impactFactor).toFixed(1),
+                revenue: Math.max(600, baseRevenue * impactFactor).toFixed(0),
+                abandonment: Math.min(95, baseAbandonment + ((latency - 200) / 100)).toFixed(0),
+                satisfaction: Math.max(1.5, baseSatisfaction * impactFactor).toFixed(1)
+            };
+        }
+
+        function updateMetrics(latency) {
+            const levelInfo = latencyLevels[latency];
+            const impact = calculateBusinessImpact(latency);
+
+            // Update latency display
+            document.getElementById('current-latency').textContent = `${latency}ms`;
+            const statusEl = document.getElementById('latency-status');
+            statusEl.textContent = levelInfo.status;
+            statusEl.className = `latency-status ${levelInfo.class}`;
+
+            // Update step info
+            document.getElementById('step-info').textContent = levelInfo.description;
+
+            // Update business metrics
+            document.getElementById('conversion-value').textContent = `${impact.conversion}%`;
+            document.getElementById('revenue-value').textContent = `$${impact.revenue}`;
+            document.getElementById('abandonment-value').textContent = `${impact.abandonment}%`;
+            document.getElementById('satisfaction-value').textContent = `${impact.satisfaction}★`;
+
+            // Update metric styling
+            updateMetricStyling('conversion-metric', parseFloat(impact.conversion), 3.2, false);
+            updateMetricStyling('revenue-metric', parseFloat(impact.revenue), 2400, false);
+            updateMetricStyling('abandonment-metric', parseFloat(impact.abandonment), 68, true);
+            updateMetricStyling('satisfaction-metric', parseFloat(impact.satisfaction), 4.2, false);
+
+            // Update chart
+            updateChart(latency);
+        }
+
+        function updateMetricStyling(elementId, current, baseline, higherIsBad) {
+            const element = document.getElementById(elementId);
+            const warningThreshold = higherIsBad ? 1.2 : 0.8;
+            const criticalThreshold = higherIsBad ? 1.5 : 0.6;
+            
+            element.className = 'metric';
+            if (higherIsBad) {
+                if (current > baseline * criticalThreshold) element.className += ' critical';
+                else if (current > baseline * warningThreshold) element.className += ' warning';
+            } else {
+                if (current < baseline * criticalThreshold) element.className += ' critical';
+                else if (current < baseline * warningThreshold) element.className += ' warning';
+            }
+        }
+
+        function setLatency(latency, buttonId) {
+            // Update button states
+            document.querySelectorAll('.btn').forEach(btn => {
+                if (btn.id.startsWith('btn-')) {
+                    btn.classList.remove('active');
+                }
+            });
+            document.getElementById(buttonId).classList.add('active');
+
+            // Update metrics and display
+            updateMetrics(latency);
+        }
+
+        function updateChart(latency) {
+            const stepLabel = `${latency}ms`;
+            
+            // Add or update the current step
+            if (latencyChart.data.labels.length === 0 || 
+                latencyChart.data.labels[latencyChart.data.labels.length - 1] !== stepLabel) {
+                latencyChart.data.labels.push(stepLabel);
+                latencyChart.data.datasets[0].data.push(latency);
+            } else {
+                // Update the last point if it's the same step
+                latencyChart.data.datasets[0].data[latencyChart.data.datasets[0].data.length - 1] = latency;
+            }
+
+            latencyChart.update('none');
+        }
+
+        function resetSimulation() {
+            // Reset to 200ms
+            setLatency(200, 'btn-200');
+            
+            // Clear chart
+            latencyChart.data.labels = [];
+            latencyChart.data.datasets[0].data = [];
+            latencyChart.update();
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('latencyChart').getContext('2d');
+            latencyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Response Time (ms)',
+                        data: [],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: '#3498db',
+                        pointBorderColor: '#2980b9',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 4500,
+                            title: {
+                                display: true,
+                                text: 'Latency (ms)',
+                                font: { size: 11 }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Latency Steps',
+                                font: { size: 11 }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initChart();
+            updateMetrics(200); // Start with 200ms
+        });
+    </script>
+</body>
+</html>
