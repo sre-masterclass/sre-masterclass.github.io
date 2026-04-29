@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Partition Resilience Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-8">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8">Network Partition Resilience Simulator</h1>
+        <div class="text-center mb-8">
+            <button id="simulateBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                Trigger Network Partition
+            </button>
+        </div>
+        <div id="simulation" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Initial State -->
+            <div id="state-normal" class="bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-xl font-semibold mb-4 text-green-400">Normal Operation</h2>
+                <p class="text-sm">All systems are connected and reporting normally.</p>
+            </div>
+            <!-- Partition State -->
+            <div id="state-partition" class="hidden bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-xl font-semibold mb-4 text-yellow-400">Network Partitioned</h2>
+                <p class="text-sm">Regional monitoring is isolated but operational. Eventual consistency is active.</p>
+            </div>
+            <!-- Resilience Response -->
+            <div id="state-resilience" class="hidden bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-xl font-semibold mb-4 text-blue-400">Resilience Response</h2>
+                <p class="text-sm">Architecture adapts, maintaining critical visibility and business continuity.</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        const simulateBtn = document.getElementById('simulateBtn');
+        const normalState = document.getElementById('state-normal');
+        const partitionState = document.getElementById('state-partition');
+        const resilienceState = document.getElementById('state-resilience');
+
+        simulateBtn.addEventListener('click', () => {
+            // Initial state
+            normalState.classList.add('hidden');
+            partitionState.classList.remove('hidden');
+            resilienceState.classList.add('hidden');
+
+            // After 2 seconds, show resilience
+            setTimeout(() => {
+                partitionState.classList.add('hidden');
+                resilienceState.classList.remove('hidden');
+            }, 2000);
+
+            // After 5 seconds, reset to normal
+            setTimeout(() => {
+                resilienceState.classList.add('hidden');
+                normalState.classList.remove('hidden');
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

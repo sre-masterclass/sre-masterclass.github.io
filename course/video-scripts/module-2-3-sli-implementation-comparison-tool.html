@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Masterclass: SLI Implementation Comparison Tool</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0;
+            min-height: 700px;
+        }
+
+        .panel {
+            padding: 30px;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .config-panel {
+            background: #f8f9fa;
+        }
+
+        .metrics-panel {
+            background: #fff;
+        }
+
+        .logs-panel {
+            background: #f1f3f5;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9em;
+        }
+
+        .control-group select, .control-group input, .control-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .control-group input:focus, .control-group select:focus, .control-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .comparison-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            transition: border-color 0.3s ease;
+        }
+
+        .comparison-card.active {
+            border-color: #667eea;
+        }
+
+        .comparison-card h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .metric-unit {
+            font-size: 0.8em;
+            color: #6c757d;
+        }
+
+        .query-builder {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.85em;
+            line-height: 1.4;
+        }
+
+        .query-validation {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .validation-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .validation-icon.valid {
+            background: #27ae60;
+        }
+
+        .validation-icon.invalid {
+            background: #e74c3c;
+        }
+
+        .validation-text {
+            font-size: 0.8em;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-bottom: 20px;
+        }
+
+        .accuracy-metrics {
+            background: #e8f5e8;
+            border: 1px solid #27ae60;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .accuracy-metrics h4 {
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+
+        .accuracy-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .accuracy-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .log-sample {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.8em;
+            line-height: 1.4;
+            margin-bottom: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .log-parsing {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .log-parsing h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .parsing-rule {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.85em;
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .tab.active {
+            background: white;
+            color: #2c3e50;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .sli-types {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .sli-type-btn {
+            padding: 8px 12px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background-color 0.3s ease;
+        }
+
+        .sli-type-btn:hover {
+            background: #5a6268;
+        }
+
+        .sli-type-btn.active {
+            background: #667eea;
+        }
+
+        .explanation {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .explanation h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        .explanation p {
+            color: #424242;
+            line-height: 1.4;
+            margin-bottom: 6px;
+            font-size: 0.9em;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .pros, .cons {
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .pros {
+            background: #e8f5e8;
+            border-left: 4px solid #27ae60;
+        }
+
+        .cons {
+            background: #ffebee;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .pros h5, .cons h5 {
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .pros ul, .cons ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .pros li, .cons li {
+            font-size: 0.8em;
+            margin-bottom: 4px;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .pros li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+        }
+
+        .cons li:before {
+            content: "✗";
+            position: absolute;
+            left: 0;
+            color: #e74c3c;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .logs-panel {
+                grid-column: 1 / -1;
+                border-right: none;
+                border-top: 1px solid #e9ecef;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .panel {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+            
+            .panel:last-child {
+                border-bottom: none;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SLI Implementation Comparison Tool</h1>
+            <p>Compare metric-based vs log-based SLI implementations with real-time accuracy analysis</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Configuration Panel -->
+            <div class="panel config-panel">
+                <h2>Configuration</h2>
+                
+                <div class="control-group">
+                    <label for="sliType">SLI Type</label>
+                    <select id="sliType">
+                        <option value="availability">Availability SLI</option>
+                        <option value="latency">Latency SLI</option>
+                        <option value="throughput">Throughput SLI</option>
+                        <option value="error_rate">Error Rate SLI</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="serviceType">Service Type</label>
+                    <select id="serviceType">
+                        <option value="web_api">Web API</option>
+                        <option value="database">Database</option>
+                        <option value="message_queue">Message Queue</option>
+                        <option value="cdn">CDN</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="timeWindow">Time Window</label>
+                    <select id="timeWindow">
+                        <option value="5m">5 minutes</option>
+                        <option value="1h">1 hour</option>
+                        <option value="24h">24 hours</option>
+                        <option value="7d">7 days</option>
+                    </select>
+                </div>
+
+                <div class="comparison-grid">
+                    <div class="comparison-card active" id="metricCard">
+                        <h4>Metric-Based SLI</h4>
+                        <div class="metric-value" id="metricValue">99.95</div>
+                        <div class="metric-unit">% availability</div>
+                    </div>
+                    <div class="comparison-card" id="logCard">
+                        <h4>Log-Based SLI</h4>
+                        <div class="metric-value" id="logValue">99.92</div>
+                        <div class="metric-unit">% availability</div>
+                    </div>
+                </div>
+
+                <div class="accuracy-metrics">
+                    <h4>Accuracy Comparison</h4>
+                    <div class="accuracy-item">
+                        <span>Correlation:</span>
+                        <span id="correlation">96.8%</span>
+                    </div>
+                    <div class="accuracy-item">
+                        <span>Latency:</span>
+                        <span id="latency">2.3s vs 45s</span>
+                    </div>
+                    <div class="accuracy-item">
+                        <span>Granularity:</span>
+                        <span id="granularity">1s vs 1m</span>
+                    </div>
+                    <div class="accuracy-item">
+                        <span>Resource Cost:</span>
+                        <span id="resourceCost">Low vs Medium</span>
+                    </div>
+                </div>
+
+                <div class="explanation">
+                    <h4>Implementation Trade-offs</h4>
+                    <p id="tradeoffText">Metric-based SLIs provide faster calculation but may lose granular detail compared to log-based analysis.</p>
+                    
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <h5>Metric-Based Pros</h5>
+                            <ul id="metricPros">
+                                <li>Real-time calculation</li>
+                                <li>Low storage cost</li>
+                                <li>Fast alerting</li>
+                                <li>Easy aggregation</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h5>Log-Based Pros</h5>
+                            <ul id="logPros">
+                                <li>Full context available</li>
+                                <li>Complex filtering</li>
+                                <li>Historical analysis</li>
+                                <li>Rich metadata</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metrics Panel -->
+            <div class="panel metrics-panel">
+                <h2>Metric-Based Implementation</h2>
+                
+                <div class="tabs">
+                    <button class="tab active" data-tab="prometheus">Prometheus</button>
+                    <button class="tab" data-tab="cloudwatch">CloudWatch</button>
+                    <button class="tab" data-tab="datadog">DataDog</button>
+                </div>
+
+                <div class="tab-content active" id="prometheus">
+                    <div class="control-group">
+                        <label for="prometheusQuery">Prometheus Query</label>
+                        <textarea id="prometheusQuery" placeholder="Enter your PromQL query...">
+sum(rate(http_requests_total{status!~"5.."}[5m])) / 
+sum(rate(http_requests_total[5m])) * 100</textarea>
+                    </div>
+                    
+                    <div class="query-validation">
+                        <div class="validation-icon valid"></div>
+                        <span class="validation-text">Query syntax is valid</span>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="cloudwatch">
+                    <div class="control-group">
+                        <label for="cloudwatchMetric">CloudWatch Metric</label>
+                        <textarea id="cloudwatchMetric" placeholder="CloudWatch metric expression...">
+SELECT AVG(StatusCheckFailed) 
+FROM SCHEMA("AWS/EC2") 
+WHERE InstanceId = 'i-1234567890abcdef0'</textarea>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="datadog">
+                    <div class="control-group">
+                        <label for="datadogQuery">DataDog Query</label>
+                        <textarea id="datadogQuery" placeholder="DataDog metric query...">
+sum:system.cpu.user{host:web-*}.as_rate() / 
+sum:system.cpu.total{host:web-*}.as_rate() * 100</textarea>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="metricsChart"></canvas>
+                </div>
+
+                <div class="query-builder">
+                    <div>Generated Query Components:</div>
+                    <div style="margin-top: 10px;">
+                        <strong>Metric:</strong> <span id="metricName">http_requests_total</span><br>
+                        <strong>Filter:</strong> <span id="metricFilter">status!~"5.."</span><br>
+                        <strong>Aggregation:</strong> <span id="metricAggregation">rate(5m)</span><br>
+                        <strong>Calculation:</strong> <span id="metricCalculation">success_rate</span>
+                    </div>
+                </div>
+
+                <div class="explanation">
+                    <h4>Metric-Based Approach</h4>
+                    <p>Pre-aggregated metrics provide fast, efficient SLI calculation with minimal computational overhead.</p>
+                    <p>Best for: Real-time alerting, high-frequency monitoring, resource-constrained environments.</p>
+                </div>
+            </div>
+
+            <!-- Logs Panel -->
+            <div class="panel logs-panel">
+                <h2>Log-Based Implementation</h2>
+                
+                <div class="tabs">
+                    <button class="tab active" data-tab="logql">LogQL (Loki)</button>
+                    <button class="tab" data-tab="elasticsearch">Elasticsearch</button>
+                    <button class="tab" data-tab="bigquery">BigQuery</button>
+                </div>
+
+                <div class="tab-content active" id="logql">
+                    <div class="control-group">
+                        <label for="logqlQuery">LogQL Query</label>
+                        <textarea id="logqlQuery" placeholder="Enter your LogQL query...">
+sum(rate({job="api"} |= "status" | json | status < 500 [5m])) /
+sum(rate({job="api"} |= "status" | json [5m])) * 100</textarea>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="elasticsearch">
+                    <div class="control-group">
+                        <label for="elasticQuery">Elasticsearch Query</label>
+                        <textarea id="elasticQuery" placeholder="Elasticsearch query...">
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"range": {"@timestamp": {"gte": "now-5m"}}},
+        {"term": {"service": "api"}}
+      ]
+    }
+  },
+  "aggs": {
+    "success_rate": {
+      "filters": {
+        "filters": {
+          "success": {"range": {"status": {"lt": 400}}},
+          "total": {"match_all": {}}
+        }
+      }
+    }
+  }
+}</textarea>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="bigquery">
+                    <div class="control-group">
+                        <label for="bigqueryQuery">BigQuery SQL</label>
+                        <textarea id="bigqueryQuery" placeholder="BigQuery SQL...">
+SELECT 
+  COUNTIF(status < 400) / COUNT(*) * 100 as availability_sli
+FROM `project.dataset.logs`
+WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 5 MINUTE)
+  AND service = 'api'</textarea>
+                    </div>
+                </div>
+
+                <div class="log-sample">
+                    <div>Sample Log Entries:</div>
+                    <div style="margin-top: 10px; font-size: 0.75em;">
+{"timestamp":"2024-01-15T10:30:15Z","service":"api","method":"GET","path":"/users","status":200,"duration":45}<br>
+{"timestamp":"2024-01-15T10:30:16Z","service":"api","method":"POST","path":"/orders","status":201,"duration":120}<br>
+{"timestamp":"2024-01-15T10:30:17Z","service":"api","method":"GET","path":"/products","status":500,"duration":30}<br>
+{"timestamp":"2024-01-15T10:30:18Z","service":"api","method":"PUT","path":"/users/123","status":200,"duration":75}<br>
+{"timestamp":"2024-01-15T10:30:19Z","service":"api","method":"DELETE","path":"/orders/456","status":204,"duration":25}
+                    </div>
+                </div>
+
+                <div class="log-parsing">
+                    <h4>Log Parsing Rules</h4>
+                    <div class="parsing-rule">
+                        Extract: status, duration, method, path
+                    </div>
+                    <div class="parsing-rule">
+                        Filter: status &lt; 500 (success criteria)
+                    </div>
+                    <div class="parsing-rule">
+                        Aggregate: success_count / total_count * 100
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="logsChart"></canvas>
+                </div>
+
+                <div class="explanation">
+                    <h4>Log-Based Approach</h4>
+                    <p>Detailed log analysis provides rich context and flexible SLI calculation from raw event data.</p>
+                    <p>Best for: Complex filtering, historical analysis, detailed debugging, compliance requirements.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let metricsChart, logsChart;
+        
+        // SLI configurations for different types
+        const sliConfigs = {
+            availability: {
+                metricQuery: `sum(rate(http_requests_total{status!~"5.."}[5m])) / 
+sum(rate(http_requests_total[5m])) * 100`,
+                logQuery: `sum(rate({job="api"} |= "status" | json | status < 500 [5m])) /
+sum(rate({job="api"} |= "status" | json [5m])) * 100`,
+                unit: "% availability"
+            },
+            latency: {
+                metricQuery: `histogram_quantile(0.95, 
+  sum(rate(http_request_duration_seconds_bucket[5m])) by (le)
+) * 1000`,
+                logQuery: `quantile_over_time(0.95, 
+  {job="api"} |= "duration" | json | unwrap duration [5m]
+)`,
+                unit: "ms (p95)"
+            },
+            throughput: {
+                metricQuery: `sum(rate(http_requests_total[5m]))`,
+                logQuery: `sum(rate({job="api"} [5m]))`,
+                unit: "req/sec"
+            },
+            error_rate: {
+                metricQuery: `sum(rate(http_requests_total{status=~"5.."}[5m])) / 
+sum(rate(http_requests_total[5m])) * 100`,
+                logQuery: `sum(rate({job="api"} |= "status" | json | status >= 500 [5m])) /
+sum(rate({job="api"} |= "status" | json [5m])) * 100`,
+                unit: "% errors"
+            }
+        };
+
+        // Generate sample data
+        function generateSampleData(type, isMetric = true) {
+            const baseValues = {
+                availability: isMetric ? [99.95, 99.92, 99.96, 99.93, 99.97] : [99.92, 99.89, 99.94, 99.90, 99.95],
+                latency: isMetric ? [45, 52, 41, 48, 44] : [47, 54, 43, 50, 46],
+                throughput: isMetric ? [1250, 1180, 1320, 1290, 1200] : [1245, 1175, 1315, 1285, 1195],
+                error_rate: isMetric ? [0.05, 0.08, 0.04, 0.07, 0.03] : [0.08, 0.11, 0.06, 0.09, 0.05]
+            };
+            
+            return baseValues[type] || baseValues.availability;
+        }
+
+        // Update SLI values
+        function updateSLIValues() {
+            const sliType = document.getElementById('sliType').value;
+            const config = sliConfigs[sliType];
+            
+            const metricData = generateSampleData(sliType, true);
+            const logData = generateSampleData(sliType, false);
+            
+            const metricValue = metricData[metricData.length - 1];
+            const logValue = logData[logData.length - 1];
+            
+            document.getElementById('metricValue').textContent = metricValue.toFixed(2);
+            document.getElementById('logValue').textContent = logValue.toFixed(2);
+            
+            // Update units
+            document.querySelectorAll('.metric-unit').forEach(el => {
+                el.textContent = config.unit;
+            });
+            
+            // Update queries
+            document.getElementById('prometheusQuery').value = config.metricQuery;
+            document.getElementById('logqlQuery').value = config.logQuery;
+            
+            // Update accuracy metrics
+            const correlation = 94 + Math.random() * 6; // 94-100%
+            document.getElementById('correlation').textContent = correlation.toFixed(1) + '%';
+            
+            updateCharts(metricData, logData, config.unit);
+        }
+
+        // Initialize charts
+        function initCharts() {
+            const ctx1 = document.getElementById('metricsChart').getContext('2d');
+            const ctx2 = document.getElementById('logsChart').getContext('2d');
+
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    }
+                }
+            };
+
+            metricsChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['5m ago', '4m ago', '3m ago', '2m ago', 'Now'],
+                    datasets: [{
+                        label: 'Metric-based SLI',
+                        data: [],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: commonOptions
+            });
+
+            logsChart = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['5m ago', '4m ago', '3m ago', '2m ago', 'Now'],
+                    datasets: [{
+                        label: 'Log-based SLI',
+                        data: [],
+                        borderColor: '#f39c12',
+                        backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: commonOptions
+            });
+        }
+
+        // Update charts
+        function updateCharts(metricData, logData, unit) {
+            metricsChart.data.datasets[0].data = metricData;
+            metricsChart.options.plugins.title = { display: true, text: `Metric-based SLI (${unit})` };
+            metricsChart.update();
+
+            logsChart.data.datasets[0].data = logData;
+            logsChart.options.plugins.title = { display: true, text: `Log-based SLI (${unit})` };
+            logsChart.update();
+        }
+
+        // Update query components
+        function updateQueryComponents() {
+            const sliType = document.getElementById('sliType').value;
+            const serviceType = document.getElementById('serviceType').value;
+            
+            const components = {
+                availability: {
+                    metricName: 'http_requests_total',
+                    metricFilter: 'status!~"5.."',
+                    metricAggregation: 'rate(5m)',
+                    metricCalculation: 'success_rate'
+                },
+                latency: {
+                    metricName: 'http_request_duration_seconds_bucket',
+                    metricFilter: 'le',
+                    metricAggregation: 'histogram_quantile(0.95)',
+                    metricCalculation: 'percentile_95'
+                },
+                throughput: {
+                    metricName: 'http_requests_total',
+                    metricFilter: 'none',
+                    metricAggregation: 'rate(5m)',
+                    metricCalculation: 'requests_per_second'
+                },
+                error_rate: {
+                    metricName: 'http_requests_total',
+                    metricFilter: 'status=~"5.."',
+                    metricAggregation: 'rate(5m)',
+                    metricCalculation: 'error_rate'
+                }
+            };
+
+            const config = components[sliType];
+            document.getElementById('metricName').textContent = config.metricName;
+            document.getElementById('metricFilter').textContent = config.metricFilter;
+            document.getElementById('metricAggregation').textContent = config.metricAggregation;
+            document.getElementById('metricCalculation').textContent = config.metricCalculation;
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize charts
+            initCharts();
+            
+            // Initial update
+            updateSLIValues();
+            updateQueryComponents();
+
+            // Input event listeners
+            document.getElementById('sliType').addEventListener('change', function() {
+                updateSLIValues();
+                updateQueryComponents();
+            });
+            
+            document.getElementById('serviceType').addEventListener('change', function() {
+                updateSLIValues();
+                updateQueryComponents();
+            });
+            
+            document.getElementById('timeWindow').addEventListener('change', function() {
+                updateSLIValues();
+                updateQueryComponents();
+            });
+
+            // Tab switching for metrics panel
+            document.querySelectorAll('.panel.metrics-panel .tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active from all tabs in metrics panel
+                    document.querySelectorAll('.panel.metrics-panel .tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.panel.metrics-panel .tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Tab switching for logs panel
+            document.querySelectorAll('.panel.logs-panel .tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active from all tabs in logs panel
+                    document.querySelectorAll('.panel.logs-panel .tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.panel.logs-panel .tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Comparison card highlighting
+            document.getElementById('metricCard').addEventListener('click', function() {
+                document.querySelectorAll('.comparison-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+
+            document.getElementById('logCard').addEventListener('click', function() {
+                document.querySelectorAll('.comparison-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+
+            // Query validation simulation
+            function validateQuery(textarea) {
+                const query = textarea.value.trim();
+                const validationIcon = textarea.parentElement.querySelector('.validation-icon');
+                const validationText = textarea.parentElement.querySelector('.validation-text');
+                
+                if (query.length > 10 && !query.includes('ERROR')) {
+                    validationIcon.className = 'validation-icon valid';
+                    validationText.textContent = 'Query syntax is valid';
+                } else {
+                    validationIcon.className = 'validation-icon invalid';
+                    validationText.textContent = 'Query has syntax errors';
+                }
+            }
+
+            // Add query validation to textareas
+            document.getElementById('prometheusQuery').addEventListener('input', function() {
+                validateQuery(this);
+            });
+        });
+    </script>
+</body>
+</html>

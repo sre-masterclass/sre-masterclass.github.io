@@ -1,0 +1,38 @@
+apiVersion: 1
+
+providers:
+  - name: 'default'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      
+  - name: 'slo'
+    orgId: 1
+    folder: 'SLO'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/slo_dashboard.json
+
+  - name: 'resource'
+    orgId: 1
+    folder: 'Resource'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/resource_utilization_dashboard.json
+
+  - name: 'entropy'
+    orgId: 1
+    folder: 'Entropy'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/entropy_dashboard.json

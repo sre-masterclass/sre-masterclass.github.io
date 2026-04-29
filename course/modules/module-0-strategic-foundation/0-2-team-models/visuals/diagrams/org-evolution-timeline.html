@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Organizational Evolution</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 1600px;
+        }
+        h1 {
+            text-align: center;
+            color: #005f73;
+            margin-bottom: 40px;
+        }
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            padding: 20px 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background-color: #ccc;
+            transform: translateY(-50%);
+        }
+        .stage {
+            width: 30%;
+            text-align: center;
+            position: relative;
+        }
+        .stage-content {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .stage-marker {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            border: 4px solid #ccc;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -120%);
+            z-index: 1;
+        }
+        .stage h2 {
+            font-size: 1.5em;
+            margin-top: 0;
+            color: #005f73;
+        }
+        .stage h3 {
+            font-size: 1.1em;
+            color: #0a9396;
+        }
+        .stage-1 .stage-marker { border-color: #94d2bd; }
+        .stage-2 .stage-marker { border-color: #ee9b00; }
+        .stage-3 .stage-marker { border-color: #ae2012; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SRE Organizational Evolution Timeline</h1>
+        <div class="timeline">
+            <div class="stage stage-1">
+                <div class="stage-marker"></div>
+                <div class="stage-content">
+                    <h2>Stage 1: Early Stage</h2>
+                    <h3>10-50 Engineers</h3>
+                    <p><strong>Model:</strong> Centralized (1-3 SREs)</p>
+                    <p><strong>Focus:</strong> Basic monitoring, incident response, foundational automation.</p>
+                </div>
+            </div>
+            <div class="stage stage-2">
+                <div class="stage-marker"></div>
+                <div class="stage-content">
+                    <h2>Stage 2: Growth Stage</h2>
+                    <h3>50-200 Engineers</h3>
+                    <p><strong>Model:</strong> Expanding Centralized or early Embedded</p>
+                    <p><strong>Focus:</strong> Standardized practices, cross-team coordination, advanced tooling.</p>
+                </div>
+            </div>
+            <div class="stage stage-3">
+                <div class="stage-marker"></div>
+                <div class="stage-content">
+                    <h2>Stage 3: Scale Stage</h2>
+                    <h3>200+ Engineers</h3>
+                    <p><strong>Model:</strong> Hybrid (Platform + Embedded)</p>
+                    <p><strong>Focus:</strong> Org-wide reliability culture, advanced automation, strategic planning.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

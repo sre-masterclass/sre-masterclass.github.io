@@ -1,0 +1,36 @@
+name: Environment Validation
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'module-*'
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  validate-environment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and start services
+        run: docker compose up -d --build
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for services to start..."
+          sleep 30 # Give services time to initialize
+          docker compose ps
+
+      - name: Check service health
+        run: |
+          # Example health check: curl the ecommerce-api
+          docker compose exec -T ecommerce-api curl --fail http://localhost:8000/ || exit 1

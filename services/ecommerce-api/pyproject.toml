@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "ecommerce-api"
+version = "0.1.0"
+description = "SRE Masterclass E-commerce API"
+authors = ["Your Name <sre.masterclass@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115.0"
+uvicorn = "^0.32.0"
+structlog = "^24.4.0"
+prometheus-client = "^0.22.1"
+pyyaml = "^6.0.2"
+psycopg2-binary = "^2.9.9"
+sqlalchemy = "^2.0.41"
+redis = "^5.2.0"
+httpx = "^0.28.1"
+tenacity = "^9.1.2"
+pybreaker = "^1.0.2"
+opentelemetry-api = "^1.28.2"
+opentelemetry-sdk = "^1.28.2"
+opentelemetry-exporter-otlp = "^1.28.2"
+opentelemetry-instrumentation-fastapi = "^0.49b2"
+opentelemetry-instrumentation-httpx = "^0.49b2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

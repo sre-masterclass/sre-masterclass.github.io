@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagram: Instrumentation Maturity Model</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #111827; color: #F3F4F6; font-family: 'Inter', sans-serif; }
+        .phase-card { background-color: #1F2937; border: 1px solid #374151; }
+    </style>
+</head>
+<body class="flex justify-center items-center h-screen p-8">
+    <div class="w-full max-w-7xl">
+        <h1 class="text-3xl font-bold text-center mb-8">Instrumentation Evolution Strategy</h1>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <!-- Phase 1 -->
+            <div class="phase-card p-6 rounded-lg">
+                <h2 class="text-xl font-bold text-blue-400 mb-3">Phase 1: Essential Metrics Foundation</h2>
+                <p class="text-sm text-gray-400 mb-4">Goal: Reliable baseline observability with minimal overhead.</p>
+                <ul class="list-disc list-inside space-y-2 text-gray-300">
+                    <li>Core business metrics</li>
+                    <li>Basic HTTP request patterns</li>
+                    <li>Error rates & basic attribution</li>
+                    <li>Resource utilization (CPU, Mem)</li>
+                </ul>
+            </div>
+
+            <!-- Phase 2 -->
+            <div class="phase-card p-6 rounded-lg">
+                <h2 class="text-xl font-bold text-yellow-400 mb-3">Phase 2: Selective Deep Attribution</h2>
+                <p class="text-sm text-gray-400 mb-4">Goal: Targeted debugging capability without constant high overhead.</p>
+                <ul class="list-disc list-inside space-y-2 text-gray-300">
+                    <li>Sample-based detailed metrics</li>
+                    <li>Time-limited high-cardinality collection</li>
+                    <li>User-initiated debugging traces</li>
+                    <li>Focus on high-value scenarios</li>
+                </ul>
+            </div>
+
+            <!-- Phase 3 -->
+            <div class="phase-card p-6 rounded-lg">
+                <h2 class="text-xl font-bold text-green-400 mb-3">Phase 3: Adaptive Instrumentation</h2>
+                <p class="text-sm text-gray-400 mb-4">Goal: Maximum observability intelligence with automatic optimization.</p>
+                <ul class="list-disc list-inside space-y-2 text-gray-300">
+                    <li>Auto-scaling detail based on system health</li>
+                    <li>Increased depth during incidents</li>
+                    <li>Reduced overhead during resource pressure</li>
+                    <li>ML-driven metric prioritization</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

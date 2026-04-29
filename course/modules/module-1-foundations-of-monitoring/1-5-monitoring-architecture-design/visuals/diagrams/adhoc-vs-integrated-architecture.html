@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad-Hoc vs. Integrated Monitoring Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-8">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8">Monitoring Architecture: Ad-Hoc vs. Integrated</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Ad-Hoc Monitoring -->
+            <div class="bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-red-400">Ad-Hoc Monitoring Tools</h2>
+                <p class="mb-4">Scattered, uncoordinated tools leading to data silos and operational blind spots.</p>
+                <div class="space-y-4">
+                    <div class="p-4 bg-gray-700 rounded-md">
+                        <h3 class="font-bold">Team A: Prometheus</h3>
+                        <p class="text-sm">Monitors service X, but data is not shared.</p>
+                    </div>
+                    <div class="p-4 bg-gray-700 rounded-md">
+                        <h3 class="font-bold">Team B: Datadog</h3>
+                        <p class="text-sm">Monitors service Y, with different alert rules.</p>
+                    </div>
+                    <div class="p-4 bg-gray-700 rounded-md">
+                        <h3 class="font-bold">Team C: ELK Stack</h3>
+                        <p class="text-sm">Manages logs, but not correlated with metrics.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Integrated Architecture -->
+            <div class="bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-green-400">Integrated Enterprise Architecture</h2>
+                <p class="mb-4">A unified system that provides a single source of truth and enables cross-team collaboration.</p>
+                <div class="p-4 bg-gray-700 rounded-md">
+                    <h3 class="font-bold">Unified Monitoring Platform</h3>
+                    <p class="text-sm mb-2">All data (metrics, logs, traces) is collected, correlated, and visualized in one place.</p>
+                    <ul class="list-disc list-inside text-sm">
+                        <li>Shared Dashboards</li>
+                        <li>Standardized Alerting</li>
+                        <li>Cross-Team Workflows</li>
+                        <li>Business Objective Alignment</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

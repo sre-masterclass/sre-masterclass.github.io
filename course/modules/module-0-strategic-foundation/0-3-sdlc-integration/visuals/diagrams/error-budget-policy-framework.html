@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Budget Policy Framework</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 95%;
+            max-width: 1600px;
+            background-color: #252526;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #4fcaf0;
+            border-bottom: 2px solid #4fcaf0;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .framework-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .components, .decision-tree {
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        h2 {
+            color: #9cdcfe;
+            margin-top: 0;
+            border-bottom: 1px solid #555;
+            padding-bottom: 8px;
+        }
+        pre {
+            background-color: #2c2c2c;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #c8c8c8;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .decision-tree ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        .decision-tree li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 25px;
+        }
+        .decision-tree li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+        }
+        .status-green::before { background-color: #4CAF50; }
+        .status-yellow::before { background-color: #ffeb3b; }
+        .status-red::before { background-color: #f44336; }
+        .status-title {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .status-details {
+            margin-left: 10px;
+            font-size: 0.95em;
+            color: #c8c8c8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Error Budget Policy Framework</h1>
+        <div class="framework-grid">
+            <div class="components">
+                <h2>Policy Components</h2>
+                <div>
+                    <h3>1. SLO Definition & Measurement</h3>
+                    <pre><code>Service Level Objectives:
+- Checkout Success Rate: 99.95%
+- API Response Time: 95th %-ile < 200ms
+- System Availability: 99.9% uptime</code></pre>
+                </div>
+                <div>
+                    <h3>2. Error Budget Calculation</h3>
+                    <pre><code>Mathematical Definition:
+(1 - SLO) × time period
+
+Examples:
+- 99.95% SLO = 22 mins/month budget
+- 99.9% SLO = 43 mins/month budget</code></pre>
+                </div>
+            </div>
+            <div class="decision-tree">
+                <h2>3. Error Budget Consumption Triggers</h2>
+                <ul>
+                    <li class="status-green">
+                        <span class="status-title">Green Status (<25% consumed)</span>
+                        <div class="status-details">
+                            <strong>Action:</strong> Normal development velocity.<br>
+                            <strong>Deployment:</strong> Automated approvals enabled.<br>
+                            <strong>Focus:</strong> Feature development.
+                        </div>
+                    </li>
+                    <li class="status-yellow">
+                        <span class="status-title">Yellow Status (25-75% consumed)</span>
+                        <div class="status-details">
+                            <strong>Action:</strong> Increased reliability focus.<br>
+                            <strong>Deployment:</strong> Manual reliability review required.<br>
+                            <strong>Focus:</strong> Balance features and reliability work.
+                        </div>
+                    </li>
+                    <li class="status-red">
+                        <span class="status-title">Red Status (>75% consumed)</span>
+                        <div class="status-details">
+                            <strong>Action:</strong> Development freeze activated.<br>
+                            <strong>Deployment:</strong> Only critical fixes allowed.<br>
+                            <strong>Focus:</strong> Restore service reliability.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

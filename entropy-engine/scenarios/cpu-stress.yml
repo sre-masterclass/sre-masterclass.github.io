@@ -1,0 +1,23 @@
+name: CPU Stress
+description: Gradually increases CPU usage of a service to simulate high load.
+steps:
+  - type: docker
+    service_id: ecommerce-api
+    action: set_resources
+    params:
+      cpu_shares: 1024
+    duration: 5
+    state: {}
+  - type: docker
+    service_id: ecommerce-api
+    action: set_resources
+    params:
+      cpu_shares: 512
+    duration: 5
+    state: {}
+  - type: docker
+    service_id: ecommerce-api
+    action: set_resources
+    params:
+      cpu_shares: 256
+    state: {}

@@ -1,0 +1,79 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "SLO Compliance",
+      "type": "table",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "avg(job:slo:availability:up) by (job)",
+          "legendFormat": "Availability",
+          "refId": "A"
+        },
+        {
+          "expr": "job:slo:http_request_latency_seconds:99p",
+          "legendFormat": "Latency (99p)",
+          "refId": "B"
+        },
+        {
+          "expr": "job:slo:http_error_rate:5m",
+          "legendFormat": "Error Rate",
+          "refId": "C"
+        }
+      ]
+    },
+    {
+      "title": "Error Budget Burn Rate (1h)",
+      "type": "gauge",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "job:slo:http_error_rate:5m / (14.4 * (1-0.99))",
+          "legendFormat": "{{job}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Error Budget Burn Rate (6h)",
+      "type": "gauge",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "job:slo:http_error_rate:5m / (6 * (1-0.99))",
+          "legendFormat": "{{job}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "SLO Compliance",
+  "uid": "slo-dashboard",
+  "version": 1
+}

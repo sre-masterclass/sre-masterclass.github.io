@@ -1,0 +1,12 @@
+name: Cascading Failure
+description: Simulates a cascading failure by introducing latency in a downstream service.
+steps:
+  - type: http
+    service_id: payment-api
+    state:
+      latency: 0.8
+    duration: 60
+  - type: http
+    service_id: payment-api
+    state:
+      latency: 0.05

@@ -1,0 +1,12 @@
+name: Network Partition
+description: Simulates a network partition by disconnecting a service from the network.
+steps:
+  - type: docker
+    service_id: ecommerce-api
+    action: disconnect_network
+    duration: 30
+    state: {}
+  - type: docker
+    service_id: ecommerce-api
+    action: connect_network
+    state: {}

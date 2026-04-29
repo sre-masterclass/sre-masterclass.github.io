@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CI/CD Pipeline with SRE Gates</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 98%;
+            max-width: 1800px;
+            background-color: #252526;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #4fcaf0;
+            border-bottom: 2px solid #4fcaf0;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .pipeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        .stage {
+            flex: 1;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+        .stage:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2em;
+            color: #666;
+        }
+        .stage h3 {
+            color: #9cdcfe;
+            margin-top: 0;
+            font-size: 1.1em;
+        }
+        .checks {
+            margin-top: 15px;
+            text-align: left;
+        }
+        .check {
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        .traditional-check {
+            background-color: rgba(200, 200, 200, 0.1);
+        }
+        .sre-check {
+            background-color: rgba(76, 175, 80, 0.2);
+            border-left: 3px solid #4CAF50;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SRE-Enhanced CI/CD Pipeline</h1>
+        <div class="pipeline">
+            <div class="stage">
+                <h3>Code Commit</h3>
+                <div class="checks">
+                    <div class="check traditional-check">Code quality & security scans</div>
+                    <div class="check sre-check">Instrumentation completeness validation</div>
+                </div>
+            </div>
+            <div class="stage">
+                <h3>Build & Test</h3>
+                <div class="checks">
+                    <div class="check traditional-check">Unit & integration tests</div>
+                    <div class="check sre-check">Performance regression testing</div>
+                </div>
+            </div>
+            <div class="stage">
+                <h3>Staging Deployment</h3>
+                <div class="checks">
+                    <div class="check traditional-check">Functional & API validation</div>
+                    <div class="check sre-check">Load testing & chaos experiments</div>
+                </div>
+            </div>
+            <div class="stage">
+                <h3>Production Readiness Gate</h3>
+                <div class="checks">
+                    <div class="check traditional-check">Business approval</div>
+                    <div class="check sre-check">Error budget check</div>
+                </div>
+            </div>
+            <div class="stage">
+                <h3>Production Deployment</h3>
+                <div class="checks">
+                    <div class="check traditional-check">Canary/Blue-Green deployment</div>
+                    <div class="check sre-check">Real-time SLO monitoring & auto-rollback</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

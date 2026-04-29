@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE KPI Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 15px; }
+        .container { max-width: 1600px; margin: auto; }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 15px; }
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .panel { background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 15px; }
+        .full-width { grid-column: 1 / -1; }
+        .leading-indicators-panel { display: grid; grid-template-columns: 1fr 2fr; align-items: center; gap: 15px; }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 10px; font-size: 1.2em; }
+        h3 { font-size: 1em; color: #2c3e50; margin-bottom: 5px; }
+        .context { font-size: 0.9em; line-height: 1.5; }
+        .context strong { color: #34495e; }
+        .context ul { list-style-position: inside; padding-left: 0; margin-top: 5px; }
+        .chart-container { position: relative; height: 280px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SRE KPI Dashboard</h1>
+        <div class="dashboard">
+            <div class="panel">
+                <h2>Business Impact</h2>
+                <div class="chart-container">
+                    <canvas id="businessImpactChart"></canvas>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>Operational Excellence</h2>
+                <div class="chart-container">
+                    <canvas id="operationalExcellenceChart"></canvas>
+                </div>
+            </div>
+            <div class="panel full-width">
+                <div class="leading-indicators-panel">
+                    <div>
+                        <h2>Leading Indicators</h2>
+                        <div class="chart-container" style="height: 220px;">
+                            <canvas id="leadingIndicatorsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="context">
+                        <h3>Indicator Definitions (Score 1-5)</h3>
+                        <ul>
+                            <li><strong>Error Budget Health:</strong> A score of 5 means 0% of the error budget is burned. A score of 1 means >80% is burned. (Higher is better)</li>
+                            <li><strong>Deployment Success:</strong> A score based on the percentage of successful deployments (e.g., 5 for >99%, 1 for <90%).</li>
+                            <li><strong>SRE Maturity:</strong> A qualitative score from 1 (Ad-hoc) to 5 (Optimized) based on team practices.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Business Impact Chart (Combo Bar/Line)
+        new Chart(document.getElementById('businessImpactChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [
+                    {
+                        label: 'Customer Satisfaction (%)',
+                        data: [70, 75, 82, 88],
+                        type: 'line',
+                        borderColor: '#3498db',
+                        backgroundColor: '#3498db',
+                        yAxisID: 'y-axis-percent',
+                        order: 0 // Render line on top
+                    },
+                    {
+                        label: 'Revenue Protected ($)',
+                        data: [500000, 800000, 1200000, 1500000],
+                        backgroundColor: '#27ae60',
+                        yAxisID: 'y-axis-dollars',
+                        order: 1 // Render bar behind
+                    }
+                ]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    'y-axis-dollars': {
+                        type: 'linear',
+                        position: 'left',
+                        ticks: {
+                            callback: function(value) { return '$' + value / 1000 + 'K'; }
+                        }
+                    },
+                    'y-axis-percent': {
+                        type: 'linear',
+                        position: 'right',
+                        min: 0,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) { return value + '%'; }
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
+                }
+            }
+        });
+
+        // Operational Excellence Chart
+        new Chart(document.getElementById('operationalExcellenceChart'), {
+            type: 'line',
+            data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [{
+                    label: 'Incident Frequency',
+                    data: [50, 30, 15, 5],
+                    borderColor: '#e74c3c',
+                    fill: false
+                }]
+            },
+            options: {
+                maintainAspectRatio: false
+            }
+        });
+
+        // Leading Indicators Chart
+        new Chart(document.getElementById('leadingIndicatorsChart'), {
+            type: 'radar',
+            data: {
+                labels: ['Error Budget Health', 'Deployment Success', 'SRE Maturity'],
+                datasets: [{
+                    label: 'Current State (1-5)',
+                    data: [3, 5, 4],
+                    backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                    borderColor: 'rgb(52, 152, 219)',
+                    pointBackgroundColor: 'rgb(52, 152, 219)'
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                r: {
+                    angleLines: {
+                        display: true
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: 5,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

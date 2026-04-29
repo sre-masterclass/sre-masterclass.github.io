@@ -1,0 +1,16 @@
+name: Database Connection Pool Exhaustion
+description: Simulates a database connection pool exhaustion by setting the pool size to a low number.
+steps:
+  - type: docker
+    service_id: ecommerce-api
+    action: set_env
+    params:
+      DB_POOL_SIZE: 1
+    duration: 60
+    state: {}
+  - type: docker
+    service_id: ecommerce-api
+    action: set_env
+    params:
+      DB_POOL_SIZE: 10
+    state: {}

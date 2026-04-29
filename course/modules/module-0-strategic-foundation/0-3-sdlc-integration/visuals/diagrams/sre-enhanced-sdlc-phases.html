@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE-Enhanced SDLC Phases</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 95%;
+            max-width: 1800px;
+            background-color: #252526;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #4fcaf0;
+            border-bottom: 2px solid #4fcaf0;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .phases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .phase {
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .phase h3 {
+            color: #9cdcfe;
+            margin-top: 0;
+            border-bottom: 1px solid #555;
+            padding-bottom: 8px;
+        }
+        .detail-category {
+            margin-top: 15px;
+        }
+        .detail-category strong {
+            color: #4fcaf0;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .detail-category p {
+            margin: 0;
+            padding-left: 10px;
+            border-left: 2px solid #4fcaf0;
+            font-size: 0.95em;
+            color: #c8c8c8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SRE-Enhanced SDLC: Integration Points</h1>
+        <div class="phases-grid">
+            <div class="phase">
+                <h3>Phase 1: Requirements & Planning</h3>
+                <div class="detail-category">
+                    <strong>SRE Input:</strong>
+                    <p>Reliability requirements alongside functional requirements.</p>
+                </div>
+                <div class="detail-category">
+                    <strong>SRE Deliverable:</strong>
+                    <p>SLO targets and error budget allocation for the sprint.</p>
+                </div>
+                <div class="detail-category">
+                    <strong>Integration Point:</strong>
+                    <p>Product backlog includes reliability user stories.</p>
+                </div>
+            </div>
+            <div class="phase">
+                <h3>Phase 2: Architecture & Design</h3>
+                <div class="detail-category">
+                    <strong>SRE Input:</strong>
+                    <p>System design review for reliability patterns and failure modes.</p>
+                </div>
+                <div class="detail-category">
+                    <strong>SRE Deliverable:</strong>
+                    <p>Monitoring architecture and alerting strategy.</p>
+                </div>
+                <div class="detail-category">
+                    <strong>Integration Point:</strong>
+                    <p>Technical debt prioritization based on reliability impact.</p>
+                </div>
+            </div>
+            <div class="phase">
+                <h3>Phase 3: Development & Implementation</h3>
+                <div class="detail-category">
+                    <strong>SRE Input:</strong>
+                    <p>Code review for reliability best practices and observability.</p>
+                </div>
+                <div class="detail-category">
+                    <strong>SRE Deliverable:</strong>
+                    <p>Instrumentation implementation and feature flags.</p>
+                </div>
+                <div class="detail-category">
+                    <strong>Integration Point:</strong>
+                    <p>Gradual rollout strategies built into feature development.</p>
+                </div>
+            </div>
+            <div class="phase">
+                <h3>Phase 4: Testing & Validation</h3>
+                <div class="detail-category">
+                    <strong>SRE Input:</strong>
+                    <p>Load testing scenarios and chaos engineering experiments.</p>
+                </div>
+                <div class="detail-category">
+                    <strong>SRE Deliverable:</strong>
+                    <p>Performance baselines and reliability metrics validation.</p>
+                </div>
+                <div class="detail-category">
+                    <strong>Integration Point:</strong>
+                    <p>Automated reliability validation in CI/CD pipeline.</p>
+                </div>
+            </div>
+            <div class="phase">
+                <h3>Phase 5: Deployment & Operations</h3>
+                <div class="detail-category">
+                    <strong>SRE Input:</strong>
+                    <p>Deployment strategy and automated rollback procedures.</p>
+                </div>
+                <div class="detail-category">
+                    <strong>SRE Deliverable:</strong>
+                    <p>Production monitoring and incident response automation.</p>
+                </div>
+                <div class="detail-category">
+                    <strong>Integration Point:</strong>
+                    <p>Error budget policies guide go/no-go deployment decisions.</p>
+                </div>
+            </div>
+            <div class="phase">
+                <h3>Phase 6: Post-Deployment Learning</h3>
+                <div class="detail-category">
+                    <strong>SRE Input:</strong>
+                    <p>Post-incident analysis and reliability trend analysis.</p>
+                </div>
+                <div class="detail-category">
+                    <strong>SRE Deliverable:</strong>
+                    <p>System reliability improvements and capacity planning.</p>
+                </div>
+                <div class="detail-category">
+                    <strong>Integration Point:</strong>
+                    <p>Reliability learnings influence future development priorities.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Masterclass: SLO Calculator & Burn Rate Simulator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .controls-panel {
+            background: #f8f9fa;
+            padding: 30px;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .visualization-panel {
+            padding: 30px;
+            background: white;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95em;
+        }
+
+        .control-group input, .control-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-card h3 {
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .result-card .value {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .result-card .unit {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: white;
+            color: #2c3e50;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .scenario-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .scenario-btn {
+            padding: 10px 15px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+
+        .scenario-btn:hover {
+            background: #5a6268;
+        }
+
+        .scenario-btn.active {
+            background: #667eea;
+        }
+
+        .burn-rate-alerts {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .burn-rate-alerts h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .alert-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ffeaa7;
+        }
+
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+
+        .alert-severity {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .alert-severity.high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert-severity.medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .alert-severity.low {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls-panel {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .scenario-buttons {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+
+        .explanation {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .explanation h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        .explanation p {
+            color: #424242;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SLO Calculator & Burn Rate Simulator</h1>
+            <p>Interactive tool for SLO mathematics, error budget calculations, and burn rate analysis</p>
+        </div>
+
+        <div class="main-content">
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label for="sloTarget">SLO Target (%)</label>
+                    <input type="number" id="sloTarget" value="99.9" min="90" max="99.99" step="0.001">
+                </div>
+
+                <div class="control-group">
+                    <label for="timePeriod">Time Period</label>
+                    <select id="timePeriod">
+                        <option value="30">30 days</option>
+                        <option value="7">7 days</option>
+                        <option value="1">24 hours</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="currentUptime">Current Uptime (%)</label>
+                    <input type="number" id="currentUptime" value="99.95" min="0" max="100" step="0.001">
+                </div>
+
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>Error Budget</h3>
+                        <div class="value" id="errorBudget">0.1</div>
+                        <div class="unit">%</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>Downtime Allowed</h3>
+                        <div class="value" id="downtimeAllowed">43.2</div>
+                        <div class="unit">minutes</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>Budget Remaining</h3>
+                        <div class="value" id="budgetRemaining">88.9</div>
+                        <div class="unit">%</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>Burn Rate</h3>
+                        <div class="value" id="burnRate">1.5</div>
+                        <div class="unit">x</div>
+                    </div>
+                </div>
+
+                <div class="scenario-buttons">
+                    <button class="scenario-btn active" data-scenario="normal">Normal Operations</button>
+                    <button class="scenario-btn" data-scenario="incident">During Incident</button>
+                    <button class="scenario-btn" data-scenario="maintenance">Maintenance Window</button>
+                    <button class="scenario-btn" data-scenario="degraded">Degraded Performance</button>
+                </div>
+
+                <div class="burn-rate-alerts">
+                    <h4>Burn Rate Alerts</h4>
+                    <div id="alertsList">
+                        <!-- Alerts will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="explanation">
+                    <h4>Understanding Error Budgets</h4>
+                    <p>Error budget = (100% - SLO target) × time period</p>
+                    <p>Burn rate = (actual errors / error budget) × time remaining</p>
+                    <p>A burn rate of 1.0 means you'll exactly consume your budget by the end of the period.</p>
+                </div>
+            </div>
+
+            <div class="visualization-panel">
+                <div class="tabs">
+                    <button class="tab active" data-tab="trends">SLO Trends</button>
+                    <button class="tab" data-tab="burnrate">Burn Rate Analysis</button>
+                    <button class="tab" data-tab="forecast">Budget Forecast</button>
+                </div>
+
+                <div class="tab-content active" id="trends">
+                    <div class="chart-container">
+                        <canvas id="trendsChart"></canvas>
+                    </div>
+                    <p style="text-align: center; color: #6c757d; margin-top: 10px;">
+                        Historical SLO compliance showing error budget consumption over time
+                    </p>
+                </div>
+
+                <div class="tab-content" id="burnrate">
+                    <div class="chart-container">
+                        <canvas id="burnrateChart"></canvas>
+                    </div>
+                    <p style="text-align: center; color: #6c757d; margin-top: 10px;">
+                        Multi-window burn rate analysis with alerting thresholds
+                    </p>
+                </div>
+
+                <div class="tab-content" id="forecast">
+                    <div class="chart-container">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                    <p style="text-align: center; color: #6c757d; margin-top: 10px;">
+                        Error budget forecast based on current burn rate trends
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables for charts
+        let trendsChart, burnrateChart, forecastChart;
+
+        // SLO calculation functions
+        function calculateErrorBudget(sloTarget, timePeriod) {
+            return (100 - sloTarget);
+        }
+
+        function calculateDowntimeAllowed(errorBudget, timePeriod) {
+            const minutesInPeriod = timePeriod * 24 * 60;
+            return (errorBudget / 100) * minutesInPeriod;
+        }
+
+        function calculateBudgetRemaining(sloTarget, currentUptime) {
+            const errorBudget = 100 - sloTarget;
+            const actualError = 100 - currentUptime;
+            const remaining = ((errorBudget - actualError) / errorBudget) * 100;
+            return Math.max(0, remaining);
+        }
+
+        function calculateBurnRate(sloTarget, currentUptime, timePeriod) {
+            const errorBudget = 100 - sloTarget;
+            const actualError = 100 - currentUptime;
+            if (errorBudget === 0) return 0;
+            return actualError / errorBudget;
+        }
+
+        // Update calculations
+        function updateCalculations() {
+            const sloTarget = parseFloat(document.getElementById('sloTarget').value);
+            const timePeriod = parseInt(document.getElementById('timePeriod').value);
+            const currentUptime = parseFloat(document.getElementById('currentUptime').value);
+
+            const errorBudget = calculateErrorBudget(sloTarget, timePeriod);
+            const downtimeAllowed = calculateDowntimeAllowed(errorBudget, timePeriod);
+            const budgetRemaining = calculateBudgetRemaining(sloTarget, currentUptime);
+            const burnRate = calculateBurnRate(sloTarget, currentUptime, timePeriod);
+
+            document.getElementById('errorBudget').textContent = errorBudget.toFixed(3);
+            document.getElementById('downtimeAllowed').textContent = downtimeAllowed.toFixed(1);
+            document.getElementById('budgetRemaining').textContent = budgetRemaining.toFixed(1);
+            document.getElementById('burnRate').textContent = burnRate.toFixed(2);
+
+            updateAlerts(burnRate);
+            updateCharts(sloTarget, currentUptime, timePeriod);
+        }
+
+        // Generate burn rate alerts
+        function updateAlerts(burnRate) {
+            const alertsList = document.getElementById('alertsList');
+            alertsList.innerHTML = '';
+
+            const alerts = [];
+
+            if (burnRate > 14.4) {
+                alerts.push({severity: 'high', message: '5m window: Critical burn rate', threshold: '> 14.4x'});
+            }
+            if (burnRate > 6) {
+                alerts.push({severity: 'high', message: '1h window: High burn rate', threshold: '> 6x'});
+            }
+            if (burnRate > 3) {
+                alerts.push({severity: 'medium', message: '6h window: Elevated burn rate', threshold: '> 3x'});
+            }
+            if (burnRate > 1) {
+                alerts.push({severity: 'low', message: '3d window: Increased burn rate', threshold: '> 1x'});
+            }
+
+            if (alerts.length === 0) {
+                alerts.push({severity: 'low', message: 'All burn rates normal', threshold: '< 1x'});
+            }
+
+            alerts.forEach(alert => {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert-item';
+                alertDiv.innerHTML = `
+                    <span>${alert.message}</span>
+                    <span class="alert-severity ${alert.severity}">${alert.threshold}</span>
+                `;
+                alertsList.appendChild(alertDiv);
+            });
+        }
+
+        // Generate sample data for charts
+        function generateTrendsData(sloTarget, currentUptime, days = 30) {
+            const data = [];
+            const labels = [];
+            const sloLine = [];
+            
+            for (let i = days; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString());
+                
+                // Generate realistic SLO data with some variance
+                let uptime = currentUptime + (Math.random() - 0.5) * 0.1;
+                if (i < 5) uptime = currentUptime; // Recent data matches current
+                
+                data.push(uptime);
+                sloLine.push(sloTarget);
+            }
+            
+            return { labels, data, sloLine };
+        }
+
+        function generateBurnRateData() {
+            const data = [];
+            const labels = [];
+            
+            for (let i = 48; i >= 0; i--) {
+                const date = new Date();
+                date.setHours(date.getHours() - i);
+                labels.push(date.toLocaleTimeString());
+                
+                // Generate burn rate data with spikes
+                let rate = 0.5 + Math.random() * 2;
+                if (i < 6 && i > 2) rate += 5; // Simulate incident
+                
+                data.push(rate);
+            }
+            
+            return { labels, data };
+        }
+
+        function generateForecastData(currentBurnRate, days = 7) {
+            const data = [];
+            const labels = [];
+            const budgetLine = [];
+            
+            let remainingBudget = parseFloat(document.getElementById('budgetRemaining').textContent);
+            
+            for (let i = 0; i <= days; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() + i);
+                labels.push(date.toLocaleDateString());
+                
+                if (i === 0) {
+                    data.push(remainingBudget);
+                } else {
+                    remainingBudget -= (currentBurnRate * (100 / (days * 24))); // Daily burn
+                    data.push(Math.max(0, remainingBudget));
+                }
+                budgetLine.push(0);
+            }
+            
+            return { labels, data, budgetLine };
+        }
+
+        // Initialize charts
+        function initCharts() {
+            const ctx1 = document.getElementById('trendsChart').getContext('2d');
+            const ctx2 = document.getElementById('burnrateChart').getContext('2d');
+            const ctx3 = document.getElementById('forecastChart').getContext('2d');
+
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    }
+                }
+            };
+
+            trendsChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Actual Uptime',
+                        data: [],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true
+                    }, {
+                        label: 'SLO Target',
+                        data: [],
+                        borderColor: '#e74c3c',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        ...commonOptions.scales,
+                        y: {
+                            ...commonOptions.scales.y,
+                            min: 99,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            burnrateChart = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Burn Rate',
+                        data: [],
+                        borderColor: '#f39c12',
+                        backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                        borderWidth: 3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    plugins: {
+                        ...commonOptions.plugins,
+                        annotation: {
+                            annotations: {
+                                line1: {
+                                    type: 'line',
+                                    yMin: 1,
+                                    yMax: 1,
+                                    borderColor: 'rgba(255, 99, 132, 0.8)',
+                                    borderWidth: 2,
+                                    borderDash: [6, 6],
+                                    label: {
+                                        content: 'Normal Rate (1x)',
+                                        enabled: true,
+                                        position: 'start'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            forecastChart = new Chart(ctx3, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Error Budget Remaining',
+                        data: [],
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        borderWidth: 3,
+                        fill: true
+                    }, {
+                        label: 'Zero Budget',
+                        data: [],
+                        borderColor: '#e74c3c',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        ...commonOptions.scales,
+                        y: {
+                            ...commonOptions.scales.y,
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update charts with new data
+        function updateCharts(sloTarget, currentUptime, timePeriod) {
+            const trendsData = generateTrendsData(sloTarget, currentUptime, timePeriod);
+            const burnRateData = generateBurnRateData();
+            const burnRate = calculateBurnRate(sloTarget, currentUptime, timePeriod);
+            const forecastData = generateForecastData(burnRate);
+
+            // Update trends chart
+            trendsChart.data.labels = trendsData.labels;
+            trendsChart.data.datasets[0].data = trendsData.data;
+            trendsChart.data.datasets[1].data = trendsData.sloLine;
+            trendsChart.update();
+
+            // Update burn rate chart
+            burnrateChart.data.labels = burnRateData.labels;
+            burnrateChart.data.datasets[0].data = burnRateData.data;
+            burnrateChart.update();
+
+            // Update forecast chart
+            forecastChart.data.labels = forecastData.labels;
+            forecastChart.data.datasets[0].data = forecastData.data;
+            forecastChart.data.datasets[1].data = forecastData.budgetLine;
+            forecastChart.update();
+        }
+
+        // Scenario presets
+        const scenarios = {
+            normal: { uptime: 99.95, description: "Normal operations with typical variance" },
+            incident: { uptime: 99.5, description: "During a service incident with elevated error rate" },
+            maintenance: { uptime: 99.8, description: "Planned maintenance window with controlled downtime" },
+            degraded: { uptime: 99.85, description: "Degraded performance affecting user experience" }
+        };
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize charts
+            initCharts();
+            
+            // Initial calculation
+            updateCalculations();
+
+            // Input event listeners
+            document.getElementById('sloTarget').addEventListener('input', updateCalculations);
+            document.getElementById('timePeriod').addEventListener('change', updateCalculations);
+            document.getElementById('currentUptime').addEventListener('input', updateCalculations);
+
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Scenario buttons
+            document.querySelectorAll('.scenario-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const scenario = scenarios[this.dataset.scenario];
+                    document.getElementById('currentUptime').value = scenario.uptime;
+                    updateCalculations();
+                });
+            });
+        });
+    </script>
+</body>
+</html>

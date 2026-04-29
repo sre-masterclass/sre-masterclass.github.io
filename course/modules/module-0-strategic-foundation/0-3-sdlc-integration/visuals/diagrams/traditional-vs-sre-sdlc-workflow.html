@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traditional SDLC vs. SRE-Integrated Workflow</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            gap: 40px;
+            padding: 40px;
+            background-color: #252526;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            width: 90%;
+            max-width: 1600px;
+        }
+        .workflow {
+            flex: 1;
+            border: 1px solid #3c3c3c;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .workflow h2 {
+            text-align: center;
+            color: #4fcaf0;
+            border-bottom: 2px solid #4fcaf0;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .phase {
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.1em;
+            position: relative;
+        }
+        .phase:not(:last-child)::after {
+            content: '▼';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #666;
+            font-size: 1.5em;
+        }
+        .traditional .phase {
+            background-color: #a52a2a; /* Reddish tint for warning */
+        }
+        .sre-integrated .phase {
+            background-color: #2a8a4a; /* Greenish tint for positive */
+        }
+        .sre-integrated .phase .sre-input {
+            font-size: 0.8em;
+            color: #a0d0a0;
+            margin-top: 5px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="workflow traditional">
+            <h2>Traditional SDLC Workflow</h2>
+            <div class="phase">Requirements</div>
+            <div class="phase">Design</div>
+            <div class="phase">Development</div>
+            <div class="phase">Testing</div>
+            <div class="phase">Deployment</div>
+            <div class="phase">Operations</div>
+        </div>
+        <div class="workflow sre-integrated">
+            <h2>SRE-Integrated Workflow</h2>
+            <div class="phase">
+                Requirements & Planning
+                <div class="sre-input">SRE Input: Reliability Requirements & SLOs</div>
+            </div>
+            <div class="phase">
+                Architecture & Design
+                <div class="sre-input">SRE Input: Design Reviews for Reliability</div>
+            </div>
+            <div class="phase">
+                Development & Implementation
+                <div class="sre-input">SRE Input: Code Reviews & Instrumentation</div>
+            </div>
+            <div class="phase">
+                Testing & Validation
+                <div class="sre-input">SRE Input: Load Testing & Chaos Experiments</div>
+            </div>
+            <div class="phase">
+                Deployment & Operations
+                <div class="sre-input">SRE Input: Automated Rollbacks & Error Budgets</div>
+            </div>
+            <div class="phase">
+                Post-Deployment Learning
+                <div class="sre-input">SRE Input: Post-Incident Analysis</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Response Comparison</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 1800px;
+        }
+        h1 {
+            text-align: center;
+            color: #005f73;
+            margin-bottom: 30px;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+        .model-column {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        .model-column h2 {
+            font-size: 1.5em;
+            color: #fff;
+            margin-top: 0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .embedded h2 { background-color: #94d2bd; }
+        .centralized h2 { background-color: #ee9b00; }
+        .hybrid h2 { background-color: #ae2012; }
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            border-left: 3px solid #ccc;
+        }
+        .event {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .event:before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #ccc;
+        }
+        .event h3 {
+            margin: 0 0 5px 0;
+            color: #005f73;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Incident Response Comparison: Major Service Outage</h1>
+        <div class="comparison">
+            <div class="model-column embedded">
+                <h2>Embedded Model</h2>
+                <div class="timeline">
+                    <div class="event">
+                        <h3>0-5 mins</h3>
+                        <p>Product team SRE immediately engaged. Deep service knowledge accelerates diagnosis.</p>
+                    </div>
+                    <div class="event">
+                        <h3>5-15 mins</h3>
+                        <p>Team makes autonomous decisions on recovery and communication.</p>
+                    </div>
+                    <div class="event">
+                        <h3>15-30 mins</h3>
+                        <p>Cross-squad coordination for related services. Shared platform tools enable rapid scaling.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="model-column centralized">
+                <h2>Centralized Model</h2>
+                <div class="timeline">
+                    <div class="event">
+                        <h3>0-5 mins</h3>
+                        <p>Centralized monitoring detects issue across multiple services simultaneously.</p>
+                    </div>
+                    <div class="event">
+                        <h3>5-15 mins</h3>
+                        <p>Platform SRE coordinates response across teams using standard procedures.</p>
+                    </div>
+                    <div class="event">
+                        <h3>15-30 mins</h3>
+                        <p>Automated systems and shared tooling enable rapid mitigation and recovery.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="model-column hybrid">
+                <h2>Hybrid Model</h2>
+                <div class="timeline">
+                    <div class="event">
+                        <h3>0-5 mins</h3>
+                        <p>Embedded SRE handles service-specific issues. Platform team manages infrastructure.</p>
+                    </div>
+                    <div class="event">
+                        <h3>5-15 mins</h3>
+                        <p>Escalation to platform team for complex infrastructure correlation and advanced tooling.</p>
+                    </div>
+                    <div class="event">
+                        <h3>15-30 mins</h3>
+                        <p>Combined service expertise and platform capabilities enable comprehensive resolution.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

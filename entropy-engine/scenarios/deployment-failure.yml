@@ -1,0 +1,12 @@
+name: Deployment Failure
+description: Simulates a failed deployment by stopping a service.
+steps:
+  - type: docker
+    service_id: ecommerce-api
+    action: stop
+    duration: 60
+    state: {}
+  - type: docker
+    service_id: ecommerce-api
+    action: start
+    state: {}

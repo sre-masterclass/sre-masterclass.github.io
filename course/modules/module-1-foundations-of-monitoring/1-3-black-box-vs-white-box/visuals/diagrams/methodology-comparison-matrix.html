@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methodology Comparison Matrix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1a202c;
+            color: #e2e8f0;
+            font-family: 'Roboto', sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #4a5568;
+            padding: 1rem;
+            text-align: left;
+        }
+        th {
+            background-color: #2d3748;
+        }
+        .check {
+            color: #48bb78;
+        }
+        .times {
+            color: #f56565;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <h1 class="text-2xl font-bold mb-4 text-center">Detection Methodology Comparison</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Failure Scenario</th>
+                <th>Black Box Detection</th>
+                <th>White Box Detection</th>
+                <th>Recommended Strategy</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Network Partition</td>
+                <td><i class="fas fa-check-circle check"></i> Immediate</td>
+                <td><i class="fas fa-times-circle times"></i> None</td>
+                <td>Black Box for detection, White Box for attribution</td>
+            </tr>
+            <tr>
+                <td>Application Crash</td>
+                <td><i class="fas fa-check-circle check"></i> Slow (via symptoms)</td>
+                <td><i class="fas fa-check-circle check"></i> Immediate</td>
+                <td>White Box for detection, Black Box for user impact</td>
+            </tr>
+            <tr>
+                <td>Database Slowdown</td>
+                <td><i class="fas fa-check-circle check"></i> Slow (latency increase)</td>
+                <td><i class="fas fa-check-circle check"></i> Immediate (query time)</td>
+                <td>White Box for early warning, Black Box for validation</td>
+            </tr>
+             <tr>
+                <td>DNS Resolution Failure</td>
+                <td><i class="fas fa-check-circle check"></i> Immediate</td>
+                <td><i class="fas fa-times-circle times"></i> None</td>
+                <td>Black Box for primary detection</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

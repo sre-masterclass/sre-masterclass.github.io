@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive: Instrumentation Strategy Comparison</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-okaidia.min.css">
+    <style>
+        body { background-color: #111827; color: #F3F4F6; font-family: 'Inter', sans-serif; }
+        .tab-button { transition: background-color 0.3s, color 0.3s; }
+        .tab-button.active { background-color: #3B82F6; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="flex justify-center items-center h-screen p-8">
+    <div class="w-full max-w-6xl bg-gray-800 rounded-lg shadow-xl p-8 border border-gray-700">
+        <h1 class="text-2xl font-bold text-center mb-6">Instrumentation Depth Strategy: A Comparative View</h1>
+        
+        <div class="flex justify-center border-b border-gray-600 mb-6">
+            <button id="show-shallow" class="tab-button py-2 px-6 text-lg font-medium rounded-t-lg">Shallow Instrumentation</button>
+            <button id="show-deep" class="tab-button py-2 px-6 text-lg font-medium rounded-t-lg">Deep Instrumentation</button>
+        </div>
+
+        <!-- Shallow Instrumentation Content -->
+        <div id="shallow-content" class="tab-content p-6 bg-gray-700 rounded-b-lg">
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-xl font-semibold mb-4 text-blue-300">Shallow Instrumentation Pattern</h3>
+                    <p class="text-gray-300 mb-4">Essential metrics with minimal cardinality, designed for low overhead and high reliability in production.</p>
+                    <pre><code class="language-python"># Essential HTTP metrics only
+http_requests_total = Counter(
+    'http_requests_total',
+    'Total HTTP requests',
+    ['method', 'status']  # 2 labels only
+)
+
+http_request_duration = Histogram(
+    'http_request_duration_seconds',
+    'HTTP request duration',
+    ['method']  # 1 label only
+)</code></pre>
+                </div>
+                <div class="bg-gray-800 p-4 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-blue-300">Performance Profile</h3>
+                    <ul class="space-y-3 text-gray-200">
+                        <li><strong>Resource Usage:</strong> ~2MB memory for time series</li>
+                        <li><strong>CPU Overhead:</strong> <0.1% CPU utilization</li>
+                        <li><strong>Network Traffic:</strong> Minimal traffic to Prometheus</li>
+                        <li><strong>Best For:</strong> Baseline monitoring, SLOs, high-traffic services</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deep Instrumentation Content -->
+        <div id="deep-content" class="tab-content p-6 bg-gray-700 rounded-b-lg">
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-xl font-semibold mb-4 text-yellow-300">Deep Instrumentation Pattern</h3>
+                    <p class="text-gray-300 mb-4">Comprehensive attribution with detailed labels, providing deep debugging capability at a higher resource cost.</p>
+                    <pre><code class="language-python"># Comprehensive business logic metrics
+http_requests_total = Counter(
+    'http_requests_total',
+    'Total HTTP requests',
+    ['method', 'status', 'endpoint', 'user_type', 'region', 'version']
+)
+
+database_queries_duration = Histogram(
+    'database_queries_duration_seconds',
+    'Database query duration',
+    ['table', 'operation', 'index_used', 'query_pattern']
+)</code></pre>
+                </div>
+                <div class="bg-gray-800 p-4 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-yellow-300">Performance Profile</h3>
+                    <ul class="space-y-3 text-gray-200">
+                        <li><strong>Resource Usage:</strong> ~50MB memory for time series</li>
+                        <li><strong>CPU Overhead:</strong> 2-3% CPU utilization</li>
+                        <li><strong>Network Traffic:</strong> 10x increase in traffic</li>
+                        <li><strong>Best For:</strong> Debugging, incident analysis, low-traffic or critical services</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-python.min.js"></script>
+    <script>
+        const shallowBtn = document.getElementById('show-shallow');
+        const deepBtn = document.getElementById('show-deep');
+        const shallowContent = document.getElementById('shallow-content');
+        const deepContent = document.getElementById('deep-content');
+
+        function setActiveTab(tab) {
+            shallowBtn.classList.remove('active');
+            deepBtn.classList.remove('active');
+            shallowContent.classList.remove('active');
+            deepContent.classList.remove('active');
+
+            if (tab === 'shallow') {
+                shallowBtn.classList.add('active');
+                shallowContent.classList.add('active');
+            } else {
+                deepBtn.classList.add('active');
+                deepContent.classList.add('active');
+            }
+        }
+
+        shallowBtn.addEventListener('click', () => setActiveTab('shallow'));
+        deepBtn.addEventListener('click', () => setActiveTab('deep'));
+
+        // Set initial state
+        setActiveTab('shallow');
+    </script>
+</body>
+</html>

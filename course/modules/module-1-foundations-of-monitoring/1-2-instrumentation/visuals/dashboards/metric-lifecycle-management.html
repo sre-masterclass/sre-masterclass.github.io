@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard: Metric Lifecycle Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #111827; color: #F3F4F6; font-family: 'Inter', sans-serif; }
+        .lifecycle-stage { background-color: #1F2937; border: 1px solid #374151; }
+    </style>
+</head>
+<body class="p-8">
+    <h1 class="text-3xl font-bold text-center mb-8">Operational Maintenance: Metric Lifecycle</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+
+        <!-- Stage 1: Creation -->
+        <div class="lifecycle-stage p-6 rounded-lg">
+            <h2 class="text-xl font-bold text-green-400 mb-3">1. Creation Standards</h2>
+            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                <li>Cardinality impact assessment required</li>
+                <li>Clear naming convention enforced</li>
+                <li>Business value documented</li>
+                <li>Tied to an SLO/SLI (if applicable)</li>
+            </ul>
+        </div>
+
+        <!-- Stage 2: Monitoring -->
+        <div class="lifecycle-stage p-6 rounded-lg">
+            <h2 class="text-xl font-bold text-blue-400 mb-3">2. Performance Monitoring</h2>
+            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                <li>Regular overhead measurement</li>
+                <li>CPU & Memory cost tracking</li>
+                <li>Query performance analysis</li>
+                <li>Optimization opportunities flagged</li>
+            </ul>
+        </div>
+
+        <!-- Stage 3: Deprecation -->
+        <div class="lifecycle-stage p-6 rounded-lg">
+            <h2 class="text-xl font-bold text-yellow-400 mb-3">3. Deprecation Strategy</h2>
+            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                <li>Identify unused/stale metrics</li>
+                <li>60-day deprecation notice period</li>
+                <li>Automated removal from code</li>
+                <li>Prevent cardinality "drift"</li>
+            </ul>
+        </div>
+
+        <!-- Stage 4: Cost Tracking -->
+        <div class="lifecycle-stage p-6 rounded-lg">
+            <h2 class="text-xl font-bold text-red-400 mb-3">4. Cost Tracking</h2>
+            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                <li>Monitor storage costs (TSDB)</li>
+                <li>Track network egress costs</li>
+                <li>Measure compute for aggregation</li>
+                <li>Attribute costs back to teams</li>
+            </ul>
+        </div>
+
+    </div>
+</body>
+</html>

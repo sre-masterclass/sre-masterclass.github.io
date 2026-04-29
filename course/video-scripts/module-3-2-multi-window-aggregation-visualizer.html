@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Masterclass: Multi-Window Aggregation Visualizer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .controls-panel {
+            background: #f8f9fa;
+            padding: 30px;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .visualization-panel {
+            padding: 30px;
+            background: white;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95em;
+        }
+
+        .control-group input, .control-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 500px;
+            margin-bottom: 20px;
+        }
+        
+        .explanation {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .explanation h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        .explanation p {
+            color: #424242;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Multi-Window Aggregation Visualizer</h1>
+            <p>Demonstrating multi-window monitoring approaches</p>
+        </div>
+
+        <div class="main-content">
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label for="timeWindow1">Time Window 1 (minutes)</label>
+                    <input type="number" id="timeWindow1" value="5" min="1" max="60">
+                </div>
+                <div class="control-group">
+                    <label for="timeWindow2">Time Window 2 (minutes)</label>
+                    <input type="number" id="timeWindow2" value="30" min="1" max="120">
+                </div>
+                <div class="control-group">
+                    <label for="dataType">Data Pattern</label>
+                    <select id="dataType">
+                        <option value="stable">Stable</option>
+                        <option value="spike">Sudden Spike</option>
+                        <option value="seasonal">Seasonal</option>
+                        <option value="deployment">Deployment</option>
+                    </select>
+                </div>
+                 <div class="explanation">
+                    <h4>Understanding Multi-Window Aggregation</h4>
+                    <p>Using multiple time windows for aggregation helps to distinguish between short-term spikes and long-term trends, providing a more accurate picture of system health.</p>
+                </div>
+            </div>
+
+            <div class="visualization-panel">
+                <div class="chart-container">
+                    <canvas id="aggregationChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const timeWindow1Input = document.getElementById('timeWindow1');
+        const timeWindow2Input = document.getElementById('timeWindow2');
+        const dataTypeSelect = document.getElementById('dataType');
+        const ctx = document.getElementById('aggregationChart').getContext('2d');
+        let aggregationChart;
+
+        function generateData(type) {
+            const data = [];
+            const labels = [];
+            const numPoints = 200;
+            for (let i = 0; i < numPoints; i++) {
+                labels.push(`T-${numPoints - i}`);
+                let value = 50;
+                switch (type) {
+                    case 'spike':
+                        if (i > 95 && i < 105) {
+                            value = 150;
+                        }
+                        break;
+                    case 'seasonal':
+                        value += 30 * Math.sin(i / 20);
+                        break;
+                    case 'deployment':
+                        if (i > 100) {
+                            value = 70;
+                        }
+                        break;
+                }
+                data.push(value + (Math.random() - 0.5) * 10);
+            }
+            return { labels, data };
+        }
+
+        function movingAverage(data, windowSize) {
+            const averagedData = [];
+            for (let i = 0; i < data.length; i++) {
+                const start = Math.max(0, i - windowSize + 1);
+                const window = data.slice(start, i + 1);
+                const average = window.reduce((a, b) => a + b, 0) / window.length;
+                averagedData.push(average);
+            }
+            return averagedData;
+        }
+
+        function updateChart() {
+            const dataType = dataTypeSelect.value;
+            const { labels, data } = generateData(dataType);
+            const window1 = parseInt(timeWindow1Input.value);
+            const window2 = parseInt(timeWindow2Input.value);
+
+            const averagedData1 = movingAverage(data, window1);
+            const averagedData2 = movingAverage(data, window2);
+
+            if (aggregationChart) {
+                aggregationChart.destroy();
+            }
+
+            aggregationChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Raw Data',
+                            data: data,
+                            borderColor: 'rgba(0, 0, 0, 0.1)',
+                            borderWidth: 1,
+                            pointRadius: 0,
+                        },
+                        {
+                            label: `MA (${window1} min)`,
+                            data: averagedData1,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 0,
+                        },
+                        {
+                            label: `MA (${window2} min)`,
+                            data: averagedData2,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 0,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        timeWindow1Input.addEventListener('change', updateChart);
+        timeWindow2Input.addEventListener('change', updateChart);
+        dataTypeSelect.addEventListener('change', updateChart);
+
+        updateChart();
+    </script>
+</body>
+</html>

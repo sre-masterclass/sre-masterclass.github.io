@@ -1,0 +1,55 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "annotations": {
+    "list": [
+      {
+        "name": "Entropy Scenarios",
+        "datasource": "Prometheus",
+        "enable": true,
+        "expr": "entropy_scenario_active",
+        "iconColor": "rgba(255, 96, 96, 1)",
+        "lineColor": "rgba(255, 96, 96, 1)",
+        "showIn": 0,
+        "tags": [],
+        "type": "tags"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Active Entropy Scenarios",
+      "type": "table",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "entropy_scenario_active",
+          "legendFormat": "{{scenario}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Entropy Scenarios",
+  "uid": "entropy-dashboard",
+  "version": 1
+}

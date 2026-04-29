@@ -1,0 +1,42 @@
+groups:
+- name: slo_rules
+  interval: 30s
+  rules:
+  # Availability
+  - record: job:slo:availability:up
+    expr: up{job=~"ecommerce-api|auth-api|payment-api|job-processor|entropy-engine"}
+
+  # Latency
+  - record: job:slo:http_request_latency_seconds:99p
+    expr: histogram_quantile(0.99, sum(rate(http_request_latency_seconds_bucket[5m])) by (le, job))
+  - record: job:slo:http_request_latency_seconds:95p
+    expr: histogram_quantile(0.95, sum(rate(http_request_latency_seconds_bucket[5m])) by (le, job))
+
+  # Error Rate
+  - record: job:slo:http_error_rate:5m
+    expr: sum(rate(http_requests_total{http_status=~"5.."}[5m])) by (job) / sum(rate(http_requests_total[5m])) by (job)
+
+  # Job Processor Throughput
+  - record: job:slo:job_processor_throughput_jobs_per_second:avg
+    expr: avg_over_time(job_processor_throughput_jobs_per_second[5m])
+
+  # Multi-window Burn Rate Alerts (30-day SLO)
+  # 1-hour window
+  - alert: HighErrorRate_1h
+    expr: job:slo:http_error_rate:5m > (14.4 * (1-0.99))
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High error rate on {{ $labels.job }} (1h window)"
+      description: "Error rate is {{ $value | printf `%.2f` }}% on job {{ $labels.job }}, which is above the 1-hour threshold for a 30-day SLO of 99%."
+
+  # 6-hour window
+  - alert: HighErrorRate_6h
+    expr: job:slo:http_error_rate:5m > (6 * (1-0.99))
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High error rate on {{ $labels.job }} (6h window)"
+      description: "Error rate is {{ $value | printf `%.2f` }}% on job {{ $labels.job }}, which is above the 6-hour threshold for a 30-day SLO of 99%."

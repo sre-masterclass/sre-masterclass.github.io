@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Masterclass - Entropy Control Center</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .service-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .service-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .service-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .status-normal { background: #27ae60; }
+        .status-warn { background: #f39c12; }
+        .status-critical { background: #e74c3c; }
+        .entropy-control {
+            margin-bottom: 15px;
+        }
+        .entropy-control label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-normal { background: #27ae60; color: white; }
+        .btn-warn { background: #f39c12; color: white; }
+        .btn-critical { background: #e74c3c; color: white; }
+        .btn-active { transform: scale(0.95); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+        .custom-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        .metrics-preview {
+            background: #ecf0f1;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .scenario-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .scenario-btn {
+            background: #3498db;
+            color: white;
+            padding: 12px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .scenario-btn:hover {
+            background: #2980b9;
+        }
+        .active-scenarios {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎛️ SRE Masterclass - Entropy Control Center</h1>
+        <p>Control system behavior to practice SRE monitoring, alerting, and incident response</p>
+    </div>
+
+    <div class="service-grid">
+        <!-- E-commerce API Service -->
+        <div class="service-card">
+            <div class="service-header">
+                <div class="service-status status-normal" id="ecommerce-status"></div>
+                <h3>E-commerce API</h3>
+            </div>
+            
+            <div class="entropy-control">
+                <label>Response Latency</label>
+                <div class="button-group">
+                    <button class="btn btn-normal btn-active" onclick="setEntropy('ecommerce', 'latency', 'normal')">Normal (50-100ms)</button>
+                    <button class="btn btn-warn" onclick="setEntropy('ecommerce', 'latency', 'warn')">Warn (500-1000ms)</button>
+                    <button class="btn btn-critical" onclick="setEntropy('ecommerce', 'latency', 'critical')">Critical (2-5s)</button>
+                </div>
+                <input type="number" class="custom-input" placeholder="Custom latency (ms)" onchange="setCustomEntropy('ecommerce', 'latency', this.value)">
+            </div>
+            
+            <div class="entropy-control">
+                <label>Error Rate</label>
+                <div class="button-group">
+                    <button class="btn btn-normal btn-active" onclick="setEntropy('ecommerce', 'errors', 'normal')">Normal (0.1%)</button>
+                    <button class="btn btn-warn" onclick="setEntropy('ecommerce', 'errors', 'warn')">Warn (5%)</button>
+                    <button class="btn btn-critical" onclick="setEntropy('ecommerce', 'errors', 'critical')">Critical (25%)</button>
+                </div>
+                <input type="number" class="custom-input" placeholder="Custom error rate (%)" step="0.1" onchange="setCustomEntropy('ecommerce', 'errors', this.value)">
+            </div>
+            
+            <div class="metrics-preview">
+                Expected Impact:<br>
+                • checkout_duration_seconds_bucket<br>
+                • http_requests_total{status="5xx"}<br>
+                • checkout_success_rate
+            </div>
+        </div>
+
+        <!-- Payment Service -->
+        <div class="service-card">
+            <div class="service-header">
+                <div class="service-status status-normal" id="payment-status"></div>
+                <h3>Payment Service</h3>
+            </div>
+            
+            <div class="entropy-control">
+                <label>Processing Latency</label>
+                <div class="button-group">
+                    <button class="btn btn-normal btn-active" onclick="setEntropy('payment', 'latency', 'normal')">Normal (100-200ms)</button>
+                    <button class="btn btn-warn" onclick="setEntropy('payment', 'latency', 'warn')">Warn (1-3s)</button>
+                    <button class="btn btn-critical" onclick="setEntropy('payment', 'latency', 'critical')">Critical (5-10s)</button>
+                </div>
+            </div>
+            
+            <div class="entropy-control">
+                <label>External Provider Issues</label>
+                <div class="button-group">
+                    <button class="btn btn-normal btn-active" onclick="setEntropy('payment', 'external', 'normal')">Normal</button>
+                    <button class="btn btn-warn" onclick="setEntropy('payment', 'external', 'warn')">Intermittent (10%)</button>
+                    <button class="btn btn-critical" onclick="setEntropy('payment', 'external', 'critical')">Outage (50%)</button>
+                </div>
+            </div>
+            
+            <div class="entropy-control">
+                <label>Cache Consistency</label>
+                <div class="button-group">
+                    <button class="btn btn-normal btn-active" onclick="setEntropy('payment', 'consistency', 'normal')">Fresh (< 30s)</button>
+                    <button class="btn btn-warn" onclick="setEntropy('payment', 'consistency', 'warn')">Stale (30-300s)</button>
+                    <button class="btn btn-critical" onclick="setEntropy('payment', 'consistency', 'critical')">Very Stale (> 300s)</button>
+                </div>
+            </div>
+            
+            <div class="metrics-preview">
+                Expected Impact:<br>
+                • payment_processing_duration_seconds<br>
+                • external_payment_calls_total{status="error"}<br>
+                • cache_operations_total{result="stale"}
+            </div>
+        </div>
+
+        <!-- Job Processor -->
+        <div class="service-card">
+            <div class="service-header">
+                <div class="service-status status-normal" id="jobs-status"></div>
+                <h3>Background Job Processor</h3>
+            </div>
+            
+            <div class="entropy-control">
+                <label>Processing Throughput</label>
+                <div class="button-group">
+                    <button class="btn btn-normal btn-active" onclick="setEntropy('jobs', 'throughput', 'normal')">Normal (100 jobs/sec)</button>
+                    <button class="btn btn-warn" onclick="setEntropy('jobs', 'throughput', 'warn')">Degraded (50 jobs/sec)</button>
+                    <button class="btn btn-critical" onclick="setEntropy('jobs', 'throughput', 'critical')">Critical (10 jobs/sec)</button>
+                </div>
+            </div>
+            
+            <div class="entropy-control">
+                <label>Memory Usage</label>
+                <div class="button-group">
+                    <button class="btn btn-normal btn-active" onclick="setEntropy('jobs', 'memory', 'normal')">Normal (200MB)</button>
+                    <button class="btn btn-warn" onclick="setEntropy('jobs', 'memory', 'warn')">High (500MB)</button>
+                    <button class="btn btn-critical" onclick="setEntropy('jobs', 'memory', 'critical')">Leak (Growing)</button>
+                </div>
+            </div>
+            
+            <div class="metrics-preview">
+                Expected Impact:<br>
+                • jobs_processed_total<br>
+                • queue_total_depth<br>
+                • memory_usage_bytes<br>
+                • processing_rate_per_second
+            </div>
+        </div>
+
+        <!-- Auth Service -->
+        <div class="service-card">
+            <div class="service-header">
+                <div class="service-status status-normal" id="auth-status"></div>
+                <h3>Authentication Service</h3>
+            </div>
+            
+            <div class="entropy-control">
+                <label>Service Availability</label>
+                <div class="button-group">
+                    <button class="btn btn-normal btn-active" onclick="setEntropy('auth', 'availability', 'normal')">Available</button>
+                    <button class="btn btn-warn" onclick="setEntropy('auth', 'availability', 'warn')">Intermittent</button>
+                    <button class="btn btn-critical" onclick="setEntropy('auth', 'availability', 'critical')">Down</button>
+                </div>
+            </div>
+            
+            <div class="entropy-control">
+                <label>Database Connections</label>
+                <div class="button-group">
+                    <button class="btn btn-normal btn-active" onclick="setEntropy('auth', 'connections', 'normal')">Normal (5/20)</button>
+                    <button class="btn btn-warn" onclick="setEntropy('auth', 'connections', 'warn')">High (15/20)</button>
+                    <button class="btn btn-critical" onclick="setEntropy('auth', 'connections', 'critical')">Exhausted (20/20)</button>
+                </div>
+            </div>
+            
+            <div class="metrics-preview">
+                Expected Impact:<br>
+                • auth_requests_total{status="success"}<br>
+                • db_connections_active<br>
+                • auth_response_duration_seconds
+            </div>
+        </div>
+    </div>
+
+    <!-- Pre-built Chaos Scenarios -->
+    <div class="scenario-panel">
+        <h3>🔥 Pre-built Chaos Scenarios</h3>
+        <p>Complex, realistic failure patterns for advanced SRE training</p>
+        
+        <button class="scenario-btn" onclick="runScenario('monday-deployment')">
+            Monday Deployment Failure
+        </button>
+        <button class="scenario-btn" onclick="runScenario('payment-cascade')">
+            Payment Provider Cascade
+        </button>
+        <button class="scenario-btn" onclick="runScenario('memory-leak')">
+            Gradual Memory Leak (20min)
+        </button>
+        <button class="scenario-btn" onclick="runScenario('traffic-spike')">
+            Black Friday Traffic Spike
+        </button>
+        <button class="scenario-btn" onclick="runScenario('database-slowdown')">
+            Database Performance Degradation
+        </button>
+        
+        <div class="active-scenarios" id="active-scenarios" style="display: none;">
+            <h4>🔴 Active Scenarios</h4>
+            <div id="scenario-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simple state management
+        let entropyState = {
+            ecommerce: { latency: 'normal', errors: 'normal' },
+            payment: { latency: 'normal', external: 'normal', consistency: 'normal' },
+            jobs: { throughput: 'normal', memory: 'normal' },
+            auth: { availability: 'normal', connections: 'normal' }
+        };
+
+        let activeScenarios = [];
+
+        function setEntropy(service, parameter, level) {
+            // Update visual state
+            updateButtonStates(service, parameter, level);
+            updateServiceStatus(service);
+            
+            // Send API call to entropy engine
+            fetch('/api/entropy/set', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ service, parameter, level })
+            });
+            
+            entropyState[service][parameter] = level;
+        }
+
+        function setCustomEntropy(service, parameter, value) {
+            // Handle custom values
+            fetch('/api/entropy/custom', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ service, parameter, value })
+            });
+        }
+
+        function runScenario(scenarioId) {
+            activeScenarios.push(scenarioId);
+            updateActiveScenarios();
+            
+            fetch('/api/scenarios/run', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ scenario: scenarioId })
+            });
+        }
+
+        function updateButtonStates(service, parameter, activeLevel) {
+            // Reset all buttons for this parameter
+            const buttons = document.querySelectorAll(`[onclick*="${service}"][onclick*="${parameter}"]`);
+            buttons.forEach(btn => btn.classList.remove('btn-active'));
+            
+            // Activate the selected button
+            const activeButton = document.querySelector(`[onclick="setEntropy('${service}', '${parameter}', '${activeLevel}')"]`);
+            if (activeButton) activeButton.classList.add('btn-active');
+        }
+
+        function updateServiceStatus(service) {
+            const statusEl = document.getElementById(service + '-status');
+            const serviceState = entropyState[service];
+            
+            // Determine overall service health
+            let status = 'normal';
+            Object.values(serviceState).forEach(state => {
+                if (state === 'critical') status = 'critical';
+                else if (state === 'warn' && status !== 'critical') status = 'warn';
+            });
+            
+            statusEl.className = `service-status status-${status}`;
+        }
+
+        function updateActiveScenarios() {
+            const activeEl = document.getElementById('active-scenarios');
+            const listEl = document.getElementById('scenario-list');
+            
+            if (activeScenarios.length > 0) {
+                activeEl.style.display = 'block';
+                listEl.innerHTML = activeScenarios.map(scenario => 
+                    `<div>• ${scenario} <button onclick="stopScenario('${scenario}')" style="margin-left: 10px;">Stop</button></div>`
+                ).join('');
+            } else {
+                activeEl.style.display = 'none';
+            }
+        }
+
+        function stopScenario(scenarioId) {
+            activeScenarios = activeScenarios.filter(s => s !== scenarioId);
+            updateActiveScenarios();
+            
+            fetch('/api/scenarios/stop', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ scenario: scenarioId })
+            });
+        }
+
+        // Initialize the interface
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial button states
+            Object.keys(entropyState).forEach(service => {
+                Object.keys(entropyState[service]).forEach(parameter => {
+                    updateButtonStates(service, parameter, entropyState[service][parameter]);
+                });
+                updateServiceStatus(service);
+            });
+        });
+    </script>
+</body>
+</html>

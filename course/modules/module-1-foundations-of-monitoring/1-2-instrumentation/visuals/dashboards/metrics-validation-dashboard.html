@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard: Metrics Validation</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #111827; color: #F3F4F6; font-family: 'Inter', sans-serif; }
+        .metric-card { background-color: #1F2937; border: 1px solid #374151; }
+        .metric-value { font-size: 2.5rem; font-weight: 700; }
+    </style>
+</head>
+<body class="p-8">
+    <h1 class="text-3xl font-bold text-center mb-8">Live Metrics Validation Dashboard</h1>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
+        
+        <!-- Metric Card: Orders Total -->
+        <div class="metric-card p-6 rounded-lg">
+            <h2 class="text-lg font-semibold text-gray-400 mb-2">Orders Total</h2>
+            <p class="metric-value text-green-400" id="orders-total">0</p>
+            <p class="text-sm text-gray-500">Total order operations processed</p>
+        </div>
+
+        <!-- Metric Card: Order Value -->
+        <div class="metric-card p-6 rounded-lg">
+            <h2 class="text-lg font-semibold text-gray-400 mb-2">Order Value (Avg)</h2>
+            <p class="metric-value text-blue-400" id="order-value-avg">$0.00</p>
+            <p class="text-sm text-gray-500">Average value from histogram</p>
+        </div>
+
+        <!-- Metric Card: Active Sessions -->
+        <div class="metric-card p-6 rounded-lg">
+            <h2 class="text-lg font-semibold text-gray-400 mb-2">Active Sessions</h2>
+            <p class="metric-value text-yellow-400" id="active-sessions">0</p>
+            <p class="text-sm text-gray-500">Current user sessions (Gauge)</p>
+        </div>
+
+    </div>
+    <div class="max-w-7xl mx-auto mt-6 text-center">
+        <button id="simulate-traffic" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">
+            Simulate Live Traffic
+        </button>
+    </div>
+
+    <script>
+        const ordersTotalEl = document.getElementById('orders-total');
+        const orderValueAvgEl = document.getElementById('order-value-avg');
+        const activeSessionsEl = document.getElementById('active-sessions');
+        const simulateBtn = document.getElementById('simulate-traffic');
+
+        let ordersTotal = 0;
+        let totalValue = 0;
+        let activeSessions = 23;
+
+        function updateDashboard() {
+            ordersTotalEl.textContent = ordersTotal;
+            const avgValue = ordersTotal > 0 ? totalValue / ordersTotal : 0;
+            orderValueAvgEl.textContent = `$${avgValue.toFixed(2)}`;
+            activeSessionsEl.textContent = activeSessions;
+        }
+
+        function simulateTraffic() {
+            setInterval(() => {
+                // New order
+                if (Math.random() > 0.5) {
+                    ordersTotal++;
+                    totalValue += Math.random() * 500 + 10; // Order value between $10 and $510
+                }
+
+                // Session changes
+                activeSessions += Math.floor(Math.random() * 5) - 2; // Fluctuate sessions
+                if (activeSessions < 10) activeSessions = 10;
+
+                updateDashboard();
+            }, 1500);
+        }
+
+        simulateBtn.addEventListener('click', () => {
+            simulateTraffic();
+            simulateBtn.disabled = true;
+            simulateBtn.textContent = 'Simulation Running...';
+        });
+
+        // Initial state
+        updateDashboard();
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+name: Resource Starvation
+description: Simulates resource starvation by setting low resource limits on a service.
+steps:
+  - type: docker
+    service_id: ecommerce-api
+    action: set_resources
+    params:
+      mem_limit: 64m
+      cpu_shares: 128
+    duration: 60
+    state: {}
+  - type: docker
+    service_id: ecommerce-api
+    action: set_resources
+    params:
+      mem_limit: 512m
+      cpu_shares: 1024
+    state: {}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive: Cardinality Management Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-okaidia.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <style>
+        body { background-color: #111827; color: #F3F4F6; font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="flex justify-center items-center h-screen p-8">
+    <div class="w-full max-w-7xl bg-gray-800 rounded-lg shadow-xl p-8 border border-gray-700">
+        <h1 class="text-2xl font-bold text-center mb-6">Live Cardinality Analysis: Bounded vs. Unbounded Labels</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Code and Controls -->
+            <div>
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2 text-red-400">BAD: Unbounded Cardinality</h3>
+                    <pre><code class="language-python"># Unbounded: user_id could be millions
+user_requests = Counter('user_requests_total', ['user_id'])</code></pre>
+                </div>
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2 text-green-400">GOOD: Bounded Cardinality</h3>
+                    <pre><code class="language-python"># Bounded: user_tier is a small, fixed set
+user_requests = Counter('user_requests_total', ['user_tier'])</code></pre>
+                </div>
+                <button id="run-analysis" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                    Run Cardinality Analysis
+                </button>
+            </div>
+            <!-- Chart -->
+            <div class="bg-gray-900 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold text-center mb-4">Time Series Growth Projection</h3>
+                <canvas id="cardinalityChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-python.min.js"></script>
+    <script>
+        const runBtn = document.getElementById('run-analysis');
+        const ctx = document.getElementById('cardinalityChart').getContext('2d');
+        let chart;
+
+        const initialData = {
+            labels: ['T=0'],
+            datasets: [
+                {
+                    label: 'Unbounded Cardinality (user_id)',
+                    data: [1],
+                    borderColor: '#F87171', // red-400
+                    backgroundColor: 'rgba(248, 113, 113, 0.2)',
+                    fill: true,
+                    tension: 0.4,
+                },
+                {
+                    label: 'Bounded Cardinality (user_tier)',
+                    data: [1],
+                    borderColor: '#60A5FA', // blue-400
+                    backgroundColor: 'rgba(96, 165, 250, 0.2)',
+                    fill: true,
+                    tension: 0.4,
+                }
+            ]
+        };
+
+        function createChart() {
+            if (chart) {
+                chart.destroy();
+            }
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: JSON.parse(JSON.stringify(initialData)), // Deep copy
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Unique Time Series' },
+                            ticks: { color: '#D1D5DB' },
+                            grid: { color: '#374151' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Time (simulation steps)' },
+                            ticks: { color: '#D1D5DB' },
+                            grid: { color: '#374151' }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#F3F4F6' } }
+                    }
+                }
+            });
+        }
+
+        function runSimulation() {
+            createChart(); // Reset chart
+            let step = 0;
+            const interval = setInterval(() => {
+                step++;
+                if (step > 10) {
+                    clearInterval(interval);
+                    return;
+                }
+
+                // Update labels
+                chart.data.labels.push(`T=${step}`);
+
+                // Unbounded growth (exponential)
+                const unboundedData = chart.data.datasets[0].data;
+                const lastUnbounded = unboundedData[unboundedData.length - 1];
+                unboundedData.push(lastUnbounded * (1.5 + Math.random() * 0.5));
+
+                // Bounded growth (plateaus)
+                const boundedData = chart.data.datasets[1].data;
+                const lastBounded = boundedData[boundedData.length - 1];
+                boundedData.push(Math.min(4, lastBounded + (Math.random() > 0.3 ? 1 : 0))); // Plateaus at 4 (e.g., free, premium, enterprise, internal)
+
+                chart.update();
+            }, 500);
+        }
+
+        runBtn.addEventListener('click', runSimulation);
+        
+        // Initial render
+        createChart();
+    </script>
+</body>
+</html>

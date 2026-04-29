@@ -1,0 +1,11 @@
+{
+  "timeline": {
+    "resolution": "1920x1080",
+    "frame_rate": 30
+  },
+  "export": {
+    "format": "mp4",
+    "codec": "h264",
+    "quality": "high"
+  }
+}

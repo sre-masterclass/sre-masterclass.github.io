@@ -1,0 +1,41 @@
+version: 2
+updates:
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Enable version updates for Docker
+  - package-ecosystem: "docker"
+    directory: "/entropy-dashboard"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "/entropy-engine"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "/services/ecommerce-api"
+    schedule:
+      interval: "weekly"
+
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/entropy-dashboard"
+    schedule:
+      interval: "weekly"
+
+  # Enable version updates for pip (Poetry)
+  - package-ecosystem: "pip"
+    directory: "/entropy-engine"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "pip"
+    directory: "/services/ecommerce-api"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "pip"
+    directory: "/tests"
+    schedule:
+      interval: "weekly"

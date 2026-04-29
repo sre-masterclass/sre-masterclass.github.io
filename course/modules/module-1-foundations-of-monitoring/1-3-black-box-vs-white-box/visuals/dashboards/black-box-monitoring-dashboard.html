@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black Box Monitoring Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+    <style>
+        body {
+            background-color: #1a202c;
+            color: #e2e8f0;
+            font-family: 'Roboto', sans-serif;
+        }
+        .panel {
+            background-color: #2d3748;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .panel-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #4a5568;
+            padding-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="panel">
+        <h2 class="panel-title"><i class="fas fa-user-secret"></i> Black Box Monitoring: External Detection Methodology</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="col-span-2">
+                <canvas id="availabilityChart"></canvas>
+            </div>
+            <div>
+                <button id="showDetailsBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Show Black Box Detection Details
+                </button>
+                <div id="details" class="hidden mt-4 p-4 bg-gray-800 rounded">
+                    <h3 class="font-bold">Key Characteristics:</h3>
+                    <ul class="list-disc list-inside mt-2">
+                        <li><strong>Detection Speed:</strong> 1-2 monitoring cycles (~30-60s)</li>
+                        <li><strong>User Correlation:</strong> Direct measurement of user experience</li>
+                        <li><strong>Simplicity:</strong> No internal system knowledge required</li>
+                        <li><strong>Coverage:</strong> Validates complete user journey</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('showDetailsBtn').addEventListener('click', () => {
+            document.getElementById('details').classList.toggle('hidden');
+        });
+
+        const ctx = document.getElementById('availabilityChart').getContext('2d');
+        const availabilityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 30}, (_, i) => `T-${29-i}`),
+                datasets: [{
+                    label: 'Service Availability',
+                    data: Array(30).fill(100),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 110,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    annotation: {
+                        annotations: {
+                            box1: {
+                                type: 'box',
+                                xMin: 20,
+                                xMax: 25,
+                                yMin: 0,
+                                yMax: 100,
+                                backgroundColor: 'rgba(255, 99, 132, 0.25)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 2,
+                                label: {
+                                    content: 'Detection Window (30-60s)',
+                                    enabled: true,
+                                    position: 'center'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

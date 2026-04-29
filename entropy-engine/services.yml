@@ -1,0 +1,25 @@
+services:
+  - id: ecommerce-api
+    name: E-commerce API
+    url: http://ecommerce-api:8000
+    entropy_endpoints:
+      latency: /entropy/latency
+      errors: /entropy/errors
+  - id: auth-api
+    name: Auth API
+    url: http://auth-api:8000
+    entropy_endpoints:
+      latency: /entropy/latency
+      errors: /entropy/errors
+  - id: payment-api
+    name: Payment API
+    url: http://payment-api:8000
+    entropy_endpoints:
+      latency: /entropy/latency
+      errors: /entropy/errors
+  - id: job-processor
+    name: Job Processor
+    url: http://job-processor:8000
+    entropy_endpoints:
+      latency: /entropy/latency
+      errors: /entropy/errors

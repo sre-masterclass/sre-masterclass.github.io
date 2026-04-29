@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Sprint Planning Simulator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 95%;
+            max-width: 1800px;
+            margin: auto;
+            background-color: #252526;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #4fcaf0;
+            border-bottom: 2px solid #4fcaf0;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .simulator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        .section {
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        h2 {
+            color: #9cdcfe;
+            margin-top: 0;
+            border-bottom: 1px solid #555;
+            padding-bottom: 8px;
+        }
+        .story-list {
+            list-style-type: none;
+            padding: 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .story {
+            background-color: #2c2c2c;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #666;
+            cursor: grab;
+        }
+        .story.reliability {
+            border-left-color: #ffeb3b;
+        }
+        .story.functional {
+            border-left-color: #2196F3;
+        }
+        #sprint-backlog {
+            min-height: 200px;
+            background-color: #2a2a2a;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .summary {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SRE-Enhanced Sprint Planning Simulator</h1>
+        <div class="simulator-grid">
+            <div class="section">
+                <h2>Product Backlog</h2>
+                <ul class="story-list" id="product-backlog" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <li class="story functional" draggable="true" id="story1" ondragstart="drag(event)">New payment flow</li>
+                    <li class="story functional" draggable="true" id="story2" ondragstart="drag(event)">User profile page update</li>
+                    <li class="story reliability" draggable="true" id="story3" ondragstart="drag(event)">Add monitoring for checkout failures</li>
+                    <li class="story functional" draggable="true" id="story4" ondragstart="drag(event)">Update marketing banner</li>
+                    <li class="story reliability" draggable="true" id="story5" ondragstart="drag(event)">Implement payment retry logic</li>
+                </ul>
+            </div>
+            <div class="section">
+                <h2>Sprint Backlog (Drag stories here)</h2>
+                <ul class="story-list" id="sprint-backlog" ondrop="drop(event)" ondragover="allowDrop(event)"></ul>
+                <div class="summary">
+                    <h3>Sprint Summary</h3>
+                    <p><strong>Error Budget for Sprint:</strong> 0.05% (22 minutes downtime)</p>
+                    <p id="sprint-summary-output">Plan your sprint by dragging stories from the product backlog.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            var target = ev.target;
+            // Ensure we are dropping into a valid drop zone
+            if (target.id === 'sprint-backlog' || target.id === 'product-backlog') {
+                target.appendChild(document.getElementById(data));
+            }
+            updateSprintSummary();
+        }
+
+        function updateSprintSummary() {
+            const sprintBacklog = document.getElementById('sprint-backlog');
+            const stories = sprintBacklog.getElementsByTagName('li');
+            let functionalStories = 0;
+            let reliabilityStories = 0;
+            let risk = 'Low';
+
+            for (let story of stories) {
+                if (story.classList.contains('functional')) {
+                    functionalStories++;
+                } else if (story.classList.contains('reliability')) {
+                    reliabilityStories++;
+                }
+            }
+
+            if (functionalStories > 2 && reliabilityStories === 0) {
+                risk = 'High - No reliability work scheduled with significant new features.';
+            } else if (functionalStories > 0 && reliabilityStories > 0) {
+                risk = 'Medium - Balanced sprint, but monitor SLOs closely.';
+            }
+
+            const summaryOutput = document.getElementById('sprint-summary-output');
+            summaryOutput.innerHTML = `
+                <p><strong>Functional Stories:</strong> ${functionalStories}</p>
+                <p><strong>Reliability Stories:</strong> ${reliabilityStories}</p>
+                <p><strong>Reliability Risk Assessment:</strong> ${risk}</p>
+            `;
+        }
+    </script>
+</body>
+</html>

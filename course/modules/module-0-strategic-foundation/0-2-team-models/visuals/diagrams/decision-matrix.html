@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Team Model Decision Matrix</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 1200px;
+        }
+        h1 {
+            text-align: center;
+            color: #005f73;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #0a9396;
+            color: white;
+            font-size: 1.1em;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .factor {
+            font-weight: bold;
+            color: #001219;
+        }
+        .recommendation {
+            font-weight: bold;
+        }
+        .rec-embedded { color: #94d2bd; }
+        .rec-centralized { color: #ee9b00; }
+        .rec-hybrid { color: #ae2012; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SRE Team Model Decision Matrix</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Organizational Factor</th>
+                    <th>Context</th>
+                    <th>Recommended Model</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="3" class="factor">Company Scale</td>
+                    <td>10-50 engineers (Startup)</td>
+                    <td class="recommendation rec-embedded">Embedded</td>
+                </tr>
+                <tr>
+                    <td>50-500 engineers (Growth)</td>
+                    <td class="recommendation rec-centralized">Centralized</td>
+                </tr>
+                <tr>
+                    <td>500+ engineers (Enterprise)</td>
+                    <td class="recommendation rec-hybrid">Hybrid</td>
+                </tr>
+                <tr>
+                    <td rowspan="3" class="factor">Technical Architecture</td>
+                    <td>Monolithic</td>
+                    <td class="recommendation rec-centralized">Centralized</td>
+                </tr>
+                <tr>
+                    <td>Microservices</td>
+                    <td class="recommendation rec-embedded">Embedded</td>
+                </tr>
+                <tr>
+                    <td>Cloud-Native / Platform</td>
+                    <td class="recommendation rec-hybrid">Hybrid</td>
+                </tr>
+                <tr>
+                    <td rowspan="3" class="factor">Engineering Culture</td>
+                    <td>High team autonomy</td>
+                    <td class="recommendation rec-embedded">Embedded</td>
+                </tr>
+                <tr>
+                    <td>Standardization focus</td>
+                    <td class="recommendation rec-centralized">Centralized</td>
+                </tr>
+                <tr>
+                    <td>Platform-as-a-product</td>
+                    <td class="recommendation rec-hybrid">Hybrid</td>
+                </tr>
+                 <tr>
+                    <td rowspan="3" class="factor">Business Context</td>
+                    <td>Rapid iteration</td>
+                    <td class="recommendation rec-embedded">Embedded</td>
+                </tr>
+                <tr>
+                    <td>Enterprise reliability</td>
+                    <td class="recommendation rec-centralized">Centralized</td>
+                </tr>
+                <tr>
+                    <td>Regulated industries</td>
+                    <td class="recommendation rec-hybrid">Hybrid</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

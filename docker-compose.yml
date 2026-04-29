@@ -1,0 +1,291 @@
+services:
+  entropy-engine:
+    build:
+      context: ./entropy-engine
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./entropy-engine:/workspace
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOCKER_HOST=unix://var/run/docker.sock
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      ecommerce-api:
+        condition: service_healthy
+    networks:
+      - sre-masterclass
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.35
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - COLLECTOR_OTLP_HTTP_HOST_PORT=:4318
+      - COLLECTOR_OTLP_GRPC_HOST_PORT=:4317
+    networks:
+      - sre-masterclass
+
+  ecommerce-api:
+    build:
+      context: ./services/ecommerce-api
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./services/ecommerce-api:/workspace
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_SERVICE_NAME=ecommerce-api
+    labels:
+      - "logging.jobname=containerlogs"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      payment-api:
+        condition: service_healthy
+    networks:
+      - sre-masterclass
+
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=sre
+      - POSTGRES_PASSWORD=sre
+      - POSTGRES_DB=sre
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sre -d sre"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sre-masterclass
+
+  payment-api:
+    build:
+      context: ./services/payment-api
+    ports:
+      - "8003:8000"
+    volumes:
+      - ./services/payment-api:/workspace
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sre-masterclass
+
+  auth-api:
+    build:
+      context: ./services/auth-api
+    ports:
+      - "8004:8000"
+    volumes:
+      - ./services/auth-api:/workspace
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sre-masterclass
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sre-masterclass
+
+  entropy-dashboard:
+    build:
+      context: ./entropy-dashboard
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./entropy-dashboard:/app
+      - /app/node_modules
+    depends_on:
+      entropy-engine:
+        condition: service_healthy
+    networks:
+      - sre-masterclass
+
+  prometheus:
+    image: prom/prometheus:v2.37.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus/rules:/etc/prometheus/rules
+    command: --config.file=/etc/prometheus/prometheus.yml --web.enable-lifecycle
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    depends_on:
+      ecommerce-api:
+        condition: service_healthy
+      auth-api:
+        condition: service_healthy
+      payment-api:
+        condition: service_healthy
+      job-processor:
+        condition: service_healthy
+    networks:
+      - sre-masterclass
+
+  grafana:
+    image: grafana/grafana:8.5.2
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./monitoring/grafana/provisioning/:/etc/grafana/provisioning/
+    depends_on:
+      - prometheus
+    networks:
+      - sre-masterclass
+
+  alertmanager:
+    image: prom/alertmanager:v0.24.0
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager:/config
+    command:
+      - '--config.file=/config/alertmanager.yml'
+    networks:
+      - sre-masterclass
+
+  loki:
+    image: grafana/loki:2.6.1
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./monitoring/loki:/etc/loki
+    command: -config.file=/etc/loki/loki-config.yml
+    networks:
+      - sre-masterclass
+
+  promtail:
+    image: grafana/promtail:2.6.1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./monitoring/promtail:/etc/promtail
+    command: -config.file=/etc/promtail/promtail-config.yml
+    networks:
+      - sre-masterclass
+
+  grafana-oncall:
+    image: grafana/oncall:v1.2.40
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./monitoring/grafana-oncall:/var/lib/grafana
+    environment:
+      - GRAFANA_ONCALL_DB_URL=postgresql://sre:sre@postgres:5432/oncall
+    networks:
+      - sre-masterclass
+
+  job-processor:
+    build:
+      context: ./services/job-processor
+    ports:
+      - "8005:8000"
+    labels:
+      - "logging.jobname=containerlogs"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - sre-masterclass
+
+  frontend:
+    build:
+      context: ./services/frontend
+    ports:
+      - "3002:5173"
+    volumes:
+      - ./services/frontend:/app
+      - /app/node_modules
+    networks:
+      - sre-masterclass
+
+  nginx:
+    image: nginx:1.23-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./monitoring/nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - sre-masterclass
+
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter
+    ports:
+      - "9187:9187"
+    environment:
+      - DATA_SOURCE_NAME=postgresql://sre:sre@postgres:5432/sre?sslmode=disable
+    networks:
+      - sre-masterclass
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.44.0
+    ports:
+      - "9121:9121"
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+    networks:
+      - sre-masterclass
+
+volumes:
+  postgres_data:
+
+networks:
+  sre-masterclass:
+    driver: bridge

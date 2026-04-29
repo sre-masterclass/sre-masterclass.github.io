@@ -1,0 +1,23 @@
+name: Memory Exhaustion
+description: Gradually increases memory usage of a service to simulate a memory leak.
+steps:
+  - type: docker
+    service_id: ecommerce-api
+    action: set_resources
+    params:
+      mem_limit: 512m
+    duration: 5
+    state: {}
+  - type: docker
+    service_id: ecommerce-api
+    action: set_resources
+    params:
+      mem_limit: 256m
+    duration: 5
+    state: {}
+  - type: docker
+    service_id: ecommerce-api
+    action: set_resources
+    params:
+      mem_limit: 128m
+    state: {}

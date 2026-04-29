@@ -1,0 +1,40 @@
+{
+  "name": "SRE Masterclass",
+  "scenes": [
+    {
+      "name": "Full Screen",
+      "sources": [
+        {
+          "type": "screen_capture",
+          "name": "Primary Monitor"
+        }
+      ]
+    },
+    {
+      "name": "PiP",
+      "sources": [
+        {
+          "type": "screen_capture",
+          "name": "Primary Monitor"
+        },
+        {
+          "type": "video_capture_device",
+          "name": "Webcam"
+        }
+      ]
+    },
+    {
+      "name": "Talking Head",
+      "sources": [
+        {
+          "type": "video_capture_device",
+          "name": "Webcam"
+        }
+      ]
+    }
+  ],
+  "output": {
+    "encoder": "nvenc",
+    "bitrate": 6000
+  }
+}

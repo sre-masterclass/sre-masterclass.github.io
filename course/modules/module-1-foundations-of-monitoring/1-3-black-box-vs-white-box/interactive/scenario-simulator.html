@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scenario Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #1a202c; color: #e2e8f0; font-family: 'Roboto', sans-serif; }
+        .panel { background-color: #2d3748; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .panel-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; border-bottom: 1px solid #4a5568; padding-bottom: 0.5rem; }
+        .btn { padding: 0.5rem 1rem; border-radius: 0.25rem; font-weight: 600; }
+        .btn-active { background-color: #4299e1; }
+    </style>
+</head>
+<body class="p-4">
+    <div class="flex justify-center space-x-4 mb-4">
+        <button id="normalBtn" class="btn btn-active">Normal Operation</button>
+        <button id="partitionBtn" class="btn">Network Partition</button>
+        <button id="recoveryBtn" class="btn">Recovery</button>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="panel">
+            <h2 class="panel-title"><i class="fas fa-user-secret"></i> Black Box Monitoring</h2>
+            <canvas id="blackBoxChart"></canvas>
+        </div>
+        <div class="panel">
+            <h2 class="panel-title"><i class="fas fa-cogs"></i> White Box Monitoring</h2>
+            <canvas id="whiteBoxChart"></canvas>
+        </div>
+    </div>
+    <div id="scenario-description" class="mt-4 p-4 bg-gray-800 rounded"></div>
+
+    <script>
+        const buttons = {
+            normal: document.getElementById('normalBtn'),
+            partition: document.getElementById('partitionBtn'),
+            recovery: document.getElementById('recoveryBtn')
+        };
+        const descriptionEl = document.getElementById('scenario-description');
+
+        const blackBoxCtx = document.getElementById('blackBoxChart').getContext('2d');
+        const whiteBoxCtx = document.getElementById('whiteBoxChart').getContext('2d');
+        let blackBoxChart, whiteBoxChart;
+
+        const data = {
+            normal: {
+                blackBox: { label: 'Availability', data: Array(10).fill(100), color: 'rgba(75, 192, 192, 1)' },
+                whiteBox: { label: 'CPU Usage', data: [30, 32, 31, 33, 30, 29, 31, 30, 32, 33], color: 'rgba(54, 162, 235, 1)' },
+                description: "System is operating normally. Both monitoring views show consistent, healthy patterns."
+            },
+            partition: {
+                blackBox: { label: 'Availability', data: [100, 100, 0, 0, 0, 0, 0, 0, 100, 100], color: 'rgba(255, 99, 132, 1)' },
+                whiteBox: { label: 'CPU Usage', data: [30, 32, 31, 33, 30, 29, 31, 30, 32, 33], color: 'rgba(54, 162, 235, 1)' },
+                description: "A network partition occurs. Black box monitoring immediately detects a complete outage, while white box monitoring shows a healthy internal system."
+            },
+            recovery: {
+                blackBox: { label: 'Availability', data: [0, 0, 50, 80, 100, 100, 100, 100, 100, 100], color: 'rgba(255, 206, 86, 1)' },
+                whiteBox: { label: 'CPU Usage', data: [30, 32, 31, 33, 30, 29, 31, 30, 32, 33], color: 'rgba(54, 162, 235, 1)' },
+                description: "The network partition is resolved. Black box monitoring shows service restoration, while white box monitoring shows continued system stability."
+            }
+        };
+
+        function createChart(ctx, chart, { label, data, color }) {
+            if (chart) chart.destroy();
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 10}, (_, i) => `T-${9-i}`),
+                    datasets: [{
+                        label,
+                        data,
+                        borderColor: color,
+                        backgroundColor: color.replace('1)', '0.2)'),
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: { scales: { y: { beginAtZero: true, max: 110, ticks: { callback: (v) => v + '%' } } } }
+            });
+        }
+
+        function setScenario(scenario) {
+            Object.values(buttons).forEach(btn => btn.classList.remove('btn-active'));
+            buttons[scenario].classList.add('btn-active');
+            
+            const scenarioData = data[scenario];
+            blackBoxChart = createChart(blackBoxCtx, blackBoxChart, scenarioData.blackBox);
+            whiteBoxChart = createChart(whiteBoxCtx, whiteBoxChart, scenarioData.whiteBox);
+            descriptionEl.textContent = scenarioData.description;
+        }
+
+        buttons.normal.addEventListener('click', () => setScenario('normal'));
+        buttons.partition.addEventListener('click', () => setScenario('partition'));
+        buttons.recovery.addEventListener('click', () => setScenario('recovery'));
+
+        // Initial state
+        setScenario('normal');
+    </script>
+</body>
+</html>

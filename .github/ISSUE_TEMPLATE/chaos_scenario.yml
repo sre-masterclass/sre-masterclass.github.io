@@ -1,0 +1,61 @@
+name: Chaos Scenario Proposal
+description: Propose a new chaos scenario for the Entropy Engine.
+title: "[Chaos Scenario]: "
+labels: ["chaos-scenario", "enhancement", "triage-needed"]
+assignees:
+  - octocat
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for contributing a new chaos scenario! Please provide as much detail as possible.
+
+  - type: input
+    id: scenario-name
+    attributes:
+      label: Scenario Name
+      description: "A short, descriptive name for the chaos scenario (e.g., 'High CPU Load on API')."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: target-service
+    attributes:
+      label: Target Service(s)
+      description: "Which service(s) will this scenario affect?"
+      multiple: true
+      options:
+        - ecommerce-api
+        - auth-service
+        - payment-service
+        - job-processor
+        - entropy-engine
+        - other
+    validations:
+      required: true
+
+  - type: textarea
+    id: scenario-description
+    attributes:
+      label: Scenario Description
+      description: "A clear and concise description of what the chaos scenario does."
+    validations:
+      required: true
+
+  - type: textarea
+    id: learning-objectives
+    attributes:
+      label: Learning Objectives
+      description: "What should a student learn from observing this scenario? What SRE principles does it demonstrate?"
+      placeholder: |
+        - Understand the impact of...
+        - Learn to identify... using...
+        - Practice responding to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation-details
+    attributes:
+      label: Implementation Details (Optional)
+      description: "If you have ideas on how to implement this, please share them. (e.g., 'Use the 'stress-ng' tool to generate CPU load')."

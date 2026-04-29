@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Model Comparison Summary</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 1800px;
+        }
+        h1 {
+            text-align: center;
+            color: #005f73;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 15px;
+        }
+        th {
+            background-color: #005f73;
+            color: white;
+            font-size: 1.2em;
+        }
+        .model-header {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .embedded { color: #94d2bd; }
+        .centralized { color: #ee9b00; }
+        .hybrid { color: #ae2012; }
+        .feature-col {
+            text-align: left;
+            font-weight: bold;
+            background-color: #f8f9fa;
+        }
+        ul {
+            text-align: left;
+            padding-left: 20px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SRE Model Comparison Summary</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th class="model-header embedded">Embedded Model</th>
+                    <th class="model-header centralized">Centralized Model</th>
+                    <th class="model-header hybrid">Hybrid Model</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="feature-col">Best For</td>
+                    <td>Product intimacy & speed</td>
+                    <td>Consistency & efficiency</td>
+                    <td>Scale & expertise</td>
+                </tr>
+                <tr>
+                    <td class="feature-col">Advantages</td>
+                    <td>
+                        <ul>
+                            <li>Fast response times</li>
+                            <li>Deep service knowledge</li>
+                            <li>Strong team ownership</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>Standardized practices</li>
+                            <li>Concentrated expertise</li>
+                            <li>Shared tooling investment</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>Combines best of both</li>
+                            <li>Clear career progression</li>
+                            <li>Handles diverse tech</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="feature-col">Trade-offs</td>
+                    <td>
+                        <ul>
+                            <li>Can be inconsistent</li>
+                            <li>Harder to scale</li>
+                            <li>Higher hiring needs</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>Can become a bottleneck</li>
+                            <li>Less product context</li>
+                            <li>Risk of "us vs. them"</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>Most complex to manage</li>
+                            <li>Requires high maturity</li>
+                            <li>Potential for bureaucracy</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="feature-col">Key Interaction</td>
+                    <td>SRE is a team member</td>
+                    <td>SRE is a consultant</td>
+                    <td>SRE is a platform provider & partner</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

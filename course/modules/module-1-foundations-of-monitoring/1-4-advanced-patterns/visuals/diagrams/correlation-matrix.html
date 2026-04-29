@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Dimensional Correlation Matrix</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .matrix-container {
+            display: grid;
+            grid-template-columns: 150px repeat(4, 1fr);
+            gap: 5px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+        .header {
+            background-color: #34495e;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        .label {
+            background-color: #95a5a6;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        .cell {
+            background-color: #ecf0f1;
+            padding: 15px;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 0.9em;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .corr-high { background-color: #e74c3c; color: white; }
+        .corr-medium { background-color: #f39c12; color: white; }
+        .corr-low { background-color: #f1c40f; }
+        .corr-none { background-color: #2ecc71; color: white; }
+        .notes {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-width: 1200px;
+        }
+        .notes h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <h1>Multi-Dimensional Correlation Matrix</h1>
+    <div class="matrix-container">
+        <!-- Headers -->
+        <div class="header"></div>
+        <div class="header">API Latency</div>
+        <div class="header">DB CPU</div>
+        <div class="header">Queue Size</div>
+        <div class="header">Conversion Rate</div>
+
+        <!-- Row 1: Payment Service -->
+        <div class="label">Payment Service</div>
+        <div class="cell corr-high">High Impact</div>
+        <div class="cell corr-medium">Medium Correlation</div>
+        <div class="cell corr-high">High Correlation</div>
+        <div class="cell corr-high">Direct Impact</div>
+
+        <!-- Row 2: Checkout Service -->
+        <div class="label">Checkout Service</div>
+        <div class="cell corr-high">Directly Affected</div>
+        <div class="cell corr-low">Low Correlation</div>
+        <div class="cell corr-medium">Medium Correlation</div>
+        <div class="cell corr-high">High Impact</div>
+
+        <!-- Row 3: Search Service -->
+        <div class="label">Search Service</div>
+        <div class="cell corr-low">Indirect Effect</div>
+        <div class="cell corr-none">No Correlation</div>
+        <div class="cell corr-none">No Correlation</div>
+        <div class="cell corr-medium">Medium Impact</div>
+
+        <!-- Row 4: User Service -->
+        <div class="label">User Service</div>
+        <div class="cell corr-medium">Medium Correlation</div>
+        <div class="cell corr-low">Low Correlation</div>
+        <div class="cell corr-low">Low Correlation</div>
+        <div class="cell corr-low">Indirect Impact</div>
+    </div>
+
+    <div class="notes">
+        <h3>Pattern Intelligence Insights:</h3>
+        <ul>
+            <li><strong>Service Dependency Patterns:</strong> A spike in <strong>Payment Service Latency</strong> has a direct, high-impact correlation with the <strong>Checkout Service</strong> and overall <strong>Conversion Rate</strong>.</li>
+            <li><strong>Resource Cascade Patterns:</strong> High <strong>DB CPU</strong> utilization is strongly correlated with a growing <strong>Queue Size</strong> for the Payment Service, indicating a potential cascading failure.</li>
+            <li><strong>Business Impact Correlation:</strong> The performance of the <strong>Search Service</strong> has a medium but significant impact on the <strong>Conversion Rate</strong>, linking technical performance to business outcomes.</li>
+            <li><strong>Operational Efficiency:</strong> Understanding these correlations allows SREs to predict that a problem in the database will first manifest as a queue issue in the payment service, and ultimately impact revenue.</li>
+        </ul>
+    </div>
+</body>
+</html>

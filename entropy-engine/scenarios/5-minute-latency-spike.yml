@@ -1,0 +1,12 @@
+name: 5-Minute Latency Spike
+description: A scenario that introduces a critical latency spike for 5 minutes.
+steps:
+  - type: set_entropy
+    service_id: ecommerce-api
+    state:
+      latency: 0.5
+    duration: 300 # 5 minutes
+  - type: set_entropy
+    service_id: ecommerce-api
+    state:
+      latency: 0

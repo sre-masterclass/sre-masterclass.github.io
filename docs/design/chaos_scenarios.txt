@@ -1,0 +1,266 @@
+# Pre-built Chaos Scenarios for SRE Training
+# Located in entropy-engine/scenarios/
+
+monday_deployment_failure:
+  name: "Monday Deployment Failure"
+  description: "Simulates common deployment issues that occur during Monday evening releases"
+  duration: "30 minutes"
+  learning_objectives:
+    - "Correlation between deployments and error rates"
+    - "Cascading failure patterns"
+    - "SLO impact assessment"
+  
+  timeline:
+    - time: "0m"
+      action: "increase_error_rate"
+      target: "payment-service"
+      value: "15%"
+      reason: "New payment provider integration has bugs"
+      
+    - time: "2m"
+      action: "cascade_latency"
+      target: "ecommerce-api"
+      value: "increase_by_500ms"
+      reason: "Payment timeouts cause checkout delays"
+      
+    - time: "5m"
+      action: "queue_backlog"
+      target: "job-processor"
+      value: "throughput_50%"
+      reason: "Failed payments generate retry jobs"
+      
+    - time: "15m"
+      action: "auto_recover"
+      target: "all"
+      reason: "Rollback deployment completed"
+
+  expected_alerts:
+    - "PaymentServiceErrorRate > 10%"
+    - "CheckoutLatencyHigh > 2s" 
+    - "JobProcessorQueueDepth > 500"
+    - "SLOBreach: CheckoutSLO < 90%"
+
+  monitoring_focus:
+    - "Multi-window SLO burn rate"
+    - "Service dependency mapping"
+    - "Error budget consumption"
+
+payment_provider_cascade:
+  name: "Payment Provider Cascade Failure"
+  description: "External payment provider outage triggering internal system degradation"
+  duration: "45 minutes"
+  learning_objectives:
+    - "External dependency failure patterns"
+    - "Circuit breaker behavior"
+    - "Graceful degradation strategies"
+
+  timeline:
+    - time: "0m"
+      action: "external_service_failure"
+      target: "payment-service"
+      service: "stripe_api"
+      failure_rate: "100%"
+      
+    - time: "1m"
+      action: "circuit_breaker_open"
+      target: "payment-service"
+      fallback: "secondary_provider"
+      
+    - time: "3m"
+      action: "increased_latency"
+      target: "payment-service"
+      value: "3000ms"
+      reason: "Secondary provider under load"
+      
+    - time: "5m"
+      action: "queue_saturation"
+      target: "job-processor"
+      reason: "Payment retry storm"
+      
+    - time: "30m"
+      action: "gradual_recovery"
+      target: "payment-service"
+      recovery_time: "15m"
+
+  expected_behavior:
+    - "Circuit breaker prevents further damage"
+    - "Secondary payment provider activates"
+    - "Increased latency but maintained availability"
+    - "Queue depth increases but stays manageable"
+
+gradual_memory_leak:
+  name: "Gradual Memory Leak Simulation"
+  description: "20-minute progression from normal to OOM kill and recovery"
+  duration: "25 minutes"
+  learning_objectives:
+    - "Resource monitoring and alerting"
+    - "Predictive capacity planning"
+    - "Container restart behavior"
+
+  timeline:
+    - time: "0m"
+      memory: "200MB"
+      status: "normal"
+      action: "baseline_measurement"
+      
+    - time: "5m"
+      memory: "400MB"
+      status: "elevated"
+      rate: "40MB/min"
+      action: "start_memory_alerts"
+      
+    - time: "10m"
+      memory: "600MB"
+      status: "warning"
+      rate: "60MB/min"
+      action: "performance_degradation_visible"
+      
+    - time: "15m"
+      memory: "800MB"
+      status: "critical"
+      rate: "80MB/min"
+      action: "service_instability"
+      
+    - time: "20m"
+      memory: "1024MB"
+      status: "oom_kill"
+      action: "container_restart"
+      
+    - time: "22m"
+      memory: "200MB"
+      status: "recovering"
+      action: "service_health_restoration"
+
+  expected_alerts:
+    - "5m: MemoryUsageHigh > 80%"
+    - "10m: MemoryUsageCritical > 90%"
+    - "15m: ServiceResponseTimeDegraded"
+    - "20m: ContainerOOMKilled"
+    - "22m: ServiceRestarted"
+
+  monitoring_focus:
+    - "Resource utilization trends"
+    - "Correlation between memory and latency"
+    - "Automatic recovery validation"
+
+black_friday_traffic_spike:
+  name: "Black Friday Traffic Spike"
+  description: "Sudden 10x traffic increase testing system scalability"
+  duration: "60 minutes"
+  learning_objectives:
+    - "Capacity planning validation"
+    - "Auto-scaling behavior"
+    - "Performance under load"
+
+  traffic_pattern:
+    - time: "0m"
+      requests_per_second: 50
+      description: "Normal baseline traffic"
+      
+    - time: "5m"
+      requests_per_second: 200
+      description: "Initial spike detection"
+      
+    - time: "10m"
+      requests_per_second: 500
+      description: "Peak traffic reached"
+      
+    - time: "30m"
+      requests_per_second: 300
+      description: "Sustained high load"
+      
+    - time: "50m"
+      requests_per_second: 100
+      description: "Traffic normalization"
+
+  expected_behavior:
+    - "Queue depth increases initially"
+    - "Response latency degrades temporarily"
+    - "Error rate may spike briefly"
+    - "System stabilizes under load"
+
+  capacity_thresholds:
+    - "Queue depth < 1000 (acceptable)"
+    - "P95 latency < 2000ms (SLO maintained)"
+    - "Error rate < 5% (within tolerance)"
+
+database_performance_degradation:
+  name: "Database Performance Degradation"
+  description: "Gradual database slowdown affecting all services"
+  duration: "40 minutes"
+  learning_objectives:
+    - "Root cause analysis across services"
+    - "Database monitoring correlation"
+    - "Service dependency impact"
+
+  timeline:
+    - time: "0m"
+      action: "inject_db_latency"
+      target: "postgres"
+      latency: "50ms"
+      description: "Subtle performance degradation begins"
+      
+    - time: "10m"
+      action: "increase_db_latency"
+      target: "postgres"
+      latency: "200ms"
+      description: "Noticeable slowdown across services"
+      
+    - time: "15m"
+      action: "connection_pool_pressure"
+      target: "all_services"
+      connections: "80% utilization"
+      description: "Services compete for DB connections"
+      
+    - time: "25m"
+      action: "query_timeout_errors"
+      target: "all_services"
+      timeout_rate: "10%"
+      description: "Some operations start timing out"
+      
+    - time: "35m"
+      action: "gradual_recovery"
+      target: "postgres"
+      recovery_time: "5m"
+      description: "Database performance restored"
+
+  correlation_patterns:
+    - "All services show latency increase"
+    - "Database connection metrics spike"
+    - "Query duration histograms shift right"
+    - "Error rates increase proportionally"
+
+# Scenario execution configuration
+execution_settings:
+  concurrent_scenarios: 1  # Only one major scenario at a time
+  safety_checks:
+    - "Stop if any service becomes completely unavailable"
+    - "Automatic rollback after max duration"
+    - "Health check validation before proceeding"
+  
+  monitoring_integration:
+    - "Generate Grafana annotations for each step"
+    - "Send AlertManager notifications for major events"
+    - "Log all scenario actions for post-exercise review"
+
+# Module-specific scenario recommendations
+module_mapping:
+  module_1_foundations:
+    recommended: []
+    description: "Focus on basic entropy toggles, no complex scenarios"
+    
+  module_2_slo_sli:
+    recommended: ["monday_deployment_failure"]
+    description: "Demonstrate SLO breach and error budget consumption"
+    
+  module_3_advanced_monitoring:
+    recommended: ["gradual_memory_leak", "database_performance_degradation"]
+    description: "Multi-window aggregation and anomaly detection"
+    
+  module_4_incident_response:
+    recommended: ["payment_provider_cascade", "black_friday_traffic_spike"]
+    description: "Complex incident scenarios requiring coordinated response"
+    
+  module_5_ci_cd:
+    recommended: ["monday_deployment_failure"]
+    description: "Deployment-related scenarios and automated response"

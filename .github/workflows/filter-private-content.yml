@@ -1,0 +1,96 @@
+name: Filter Private Content
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  filter:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Check for private content
+        run: |
+          echo "🔒 Checking for private content in public repository..."
+          
+          # Define private paths that should never be in public repo
+          PRIVATE_PATHS=(
+            "course/"
+            "docs/video_scripts/"
+            "docs/content-production/"
+            "docs/planning/"
+          )
+          
+          FOUND_PRIVATE=false
+          
+          # Check if any private paths exist
+          for path in "${PRIVATE_PATHS[@]}"; do
+            if [ -d "$path" ] || [ -f "$path" ]; then
+              echo "❌ ERROR: Private content found: $path"
+              FOUND_PRIVATE=true
+            fi
+          done
+          
+          # Check for any files that might contain private content
+          if find . -name "*.md" -type f -exec grep -l "CONFIDENTIAL\|course content\|video.*script" {} \; | grep -v "REPOSITORY_SETUP.md" | grep -v ".github"; then
+            echo "❌ WARNING: Files may contain private content markers"
+            # Don't fail the build for this, just warn
+          fi
+          
+          if [ "$FOUND_PRIVATE" = true ]; then
+            echo ""
+            echo "🛡️  SECURITY VIOLATION: Private content detected in public repository!"
+            echo ""
+            echo "This indicates a problem with the filtering process."
+            echo "Please check your local setup and git scripts."
+            echo ""
+            echo "Expected public directories only:"
+            echo "  ✅ services/"
+            echo "  ✅ monitoring/"
+            echo "  ✅ entropy-engine/"
+            echo "  ✅ entropy-dashboard/"
+            echo "  ✅ tests/"
+            echo "  ✅ scripts/"
+            echo "  ✅ docs/design/"
+            echo "  ✅ docs/development/"
+            echo "  ❌ course/ (SHOULD NOT BE HERE)"
+            echo "  ❌ docs/video_scripts/ (SHOULD NOT BE HERE)"
+            echo "  ❌ docs/content-production/ (SHOULD NOT BE HERE)"
+            echo "  ❌ docs/planning/ (SHOULD NOT BE HERE)"
+            echo ""
+            exit 1
+          fi
+          
+          echo "✅ No private content detected in public repository"
+          echo "✅ Security check passed"
+
+      - name: Validate public repository structure
+        run: |
+          echo "📋 Validating public repository structure..."
+          
+          # Check that essential public directories exist
+          REQUIRED_DIRS=(
+            "services"
+            "monitoring"
+            "entropy-engine"
+            "entropy-dashboard"
+            "scripts"
+            "docs/design"
+            "docs/development"
+          )
+          
+          for dir in "${REQUIRED_DIRS[@]}"; do
+            if [ ! -d "$dir" ]; then
+              echo "⚠️  WARNING: Expected public directory missing: $dir"
+            else
+              echo "✅ Found: $dir"
+            fi
+          done
+          
+          echo "📊 Repository validation complete"

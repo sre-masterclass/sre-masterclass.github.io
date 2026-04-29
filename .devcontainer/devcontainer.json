@@ -1,0 +1,27 @@
+{
+  "name": "SRE Masterclass",
+  "dockerComposeFile": [
+    "../docker-compose.yml"
+  ],
+  "service": "ecommerce-api",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [
+    8001,
+    8002,
+    8003,
+    8004,
+    8005,
+    3000,
+    3001,
+    3002,
+    9090,
+    9093,
+    3100,
+    8080
+  ],
+  "extensions": [
+    "ms-python.python",
+    "ms-azuretools.vscode-docker",
+    "mutantdino.resourcemonitor"
+  ]
+}
