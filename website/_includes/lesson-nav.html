@@ -1,0 +1,23 @@
+{% comment %}
+  Lesson previous/next navigation.
+  Front matter provides prev_lesson and next_lesson as URL paths.
+  prev_title / next_title are the human-readable names.
+{% endcomment %}
+
+<nav class="lesson-nav" aria-label="Lesson navigation">
+  {% if page.prev_lesson %}
+  <a href="{{ page.prev_lesson | relative_url }}" class="lesson-nav-btn prev" rel="prev">
+    <span class="lesson-nav-label">← Previous</span>
+    <span class="lesson-nav-title">{{ page.prev_title | default: "Previous Lesson" }}</span>
+  </a>
+  {% else %}
+  <div></div>
+  {% endif %}
+
+  {% if page.next_lesson %}
+  <a href="{{ page.next_lesson | relative_url }}" class="lesson-nav-btn next" rel="next">
+    <span class="lesson-nav-label">Next →</span>
+    <span class="lesson-nav-title">{{ page.next_title | default: "Next Lesson" }}</span>
+  </a>
+  {% endif %}
+</nav>

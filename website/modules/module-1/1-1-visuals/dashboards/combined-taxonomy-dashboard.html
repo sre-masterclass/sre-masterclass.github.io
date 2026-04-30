@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Masterclass - Combined Taxonomy Dashboard</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #161719; color: #d8d9da; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #f0f0f0; font-weight: 300; letter-spacing: 0.5px; }
+        .dashboard { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 30px; }
+        .layer { background-color: #1f2123; border: 1px solid #333; border-radius: 5px; padding: 20px; }
+        .layer h2 { margin-top: 0; font-size: 1.3em; color: #56a64b; border-bottom: 1px solid #444; padding-bottom: 10px; font-weight: 500; }
+        .layer p { margin: 10px 0 0 0; font-size: 0.95em; color: #bfbfbf; }
+        .layer .responsibility { font-style: italic; color: #f98538; }
+    </style>
+</head>
+<body>
+    <h1>Layered Monitoring Strategy</h1>
+    <div class="dashboard">
+        <div class="layer">
+            <h2>Layer 1: Foundation Monitoring (USE-based)</h2>
+            <p>Monitors infrastructure health and capacity, detects hardware failures, and optimizes resources.</p>
+            <p class="responsibility">Responsibility: Platform Team</p>
+        </div>
+        <div class="layer">
+            <h2>Layer 2: Service Monitoring (RED-based)</h2>
+            <p>Tracks application performance, service reliability, and inter-service dependencies.</p>
+            <p class="responsibility">Responsibility: Development Team</p>
+        </div>
+        <div class="layer">
+            <h2>Layer 3: Experience Monitoring (Golden Signals-based)</h2>
+            <p>Focuses on user journey reliability, business impact, and customer satisfaction.</p>
+            <p class="responsibility">Responsibility: Product Team</p>
+        </div>
+    </div>
+</body>
+</html>

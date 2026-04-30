@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centralized SRE Model (Netflix-style)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 1000px;
+        }
+        h1 {
+            text-align: center;
+            color: #005f73;
+            margin-bottom: 10px;
+        }
+        h2 {
+            text-align: center;
+            color: #0a9396;
+            margin-bottom: 30px;
+        }
+        svg {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Centralized SRE Model</h1>
+        <h2>(Netflix-style)</h2>
+        <svg viewBox="0 0 800 450">
+            <defs>
+                <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                    <feOffset dx="2" dy="2" result="offsetblur"/>
+                    <feComponentTransfer>
+                        <feFuncA type="linear" slope="0.5"/>
+                    </feComponentTransfer>
+                    <feMerge>
+                        <feMergeNode/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            </defs>
+
+            <!-- Central SRE Team -->
+            <g transform="translate(300, 20)">
+                <rect x="0" y="0" width="200" height="80" rx="10" fill="#ee9b00" stroke="#ca6702" stroke-width="2" filter="url(#shadow)"/>
+                <text x="100" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#fff">Central SRE</text>
+                <text x="100" y="60" text-anchor="middle" font-size="14" fill="#fff">Platform Team</text>
+            </g>
+
+            <!-- Connecting Lines -->
+            <line x1="400" y1="100" x2="400" y2="150" stroke="#333" stroke-width="2"/>
+            <line x1="150" y1="150" x2="650" y2="150" stroke="#333" stroke-width="2"/>
+            
+            <line x1="150" y1="150" x2="150" y2="200" stroke="#333" stroke-width="2"/>
+            <line x1="400" y1="150" x2="400" y2="200" stroke="#333" stroke-width="2"/>
+            <line x1="650" y1="150" x2="650" y2="200" stroke="#333" stroke-width="2"/>
+
+            <!-- Product Teams -->
+            <g transform="translate(50, 200)">
+                <rect x="0" y="0" width="200" height="60" rx="10" fill="#94d2bd" filter="url(#shadow)"/>
+                <text x="100" y="35" text-anchor="middle" font-size="16" font-weight="bold">Product Team A</text>
+            </g>
+            <g transform="translate(300, 200)">
+                <rect x="0" y="0" width="200" height="60" rx="10" fill="#94d2bd" filter="url(#shadow)"/>
+                <text x="100" y="35" text-anchor="middle" font-size="16" font-weight="bold">Product Team B</text>
+            </g>
+            <g transform="translate(550, 200)">
+                <rect x="0" y="0" width="200" height="60" rx="10" fill="#94d2bd" filter="url(#shadow)"/>
+                <text x="100" y="35" text-anchor="middle" font-size="16" font-weight="bold">Product Team C</text>
+            </g>
+            
+            <g transform="translate(175, 300)">
+                <rect x="0" y="0" width="200" height="60" rx="10" fill="#94d2bd" filter="url(#shadow)"/>
+                <text x="100" y="35" text-anchor="middle" font-size="16" font-weight="bold">Product Team D</text>
+            </g>
+            
+            <g transform="translate(425, 300)">
+                <rect x="0" y="0" width="200" height="60" rx="10" fill="#94d2bd" filter="url(#shadow)"/>
+                <text x="100" y="35" text-anchor="middle" font-size="16" font-weight="bold">Product Team E</text>
+            </g>
+
+            <line x1="275" y1="150" x2="275" y2="300" stroke="#333" stroke-width="2"/>
+            <line x1="525" y1="150" x2="525" y2="300" stroke="#333" stroke-width="2"/>
+
+
+            <text x="400" y="420" text-anchor="middle" font-size="16" font-style="italic">
+                A single, expert team provides reliability tools and standards for the entire organization.
+            </text>
+        </svg>
+    </div>
+</body>
+</html>

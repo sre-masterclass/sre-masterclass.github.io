@@ -1,0 +1,51 @@
+{% comment %}
+  Reusable interactive tool embed panel.
+
+  Usage in lesson markdown (via Liquid include):
+    {% include tool-embed.html
+       title="ROI Calculator for SRE Investment"
+       src="/tools/roi-calculator.html"
+       description="Use this calculator to model the financial impact of SRE investment at your organization. Adjust headcount, downtime costs, and reliability targets to see projected ROI."
+       height="700"
+    %}
+
+  Parameters:
+    title        — Tool display name (required)
+    src          — Path to the tool HTML file relative to site root (required)
+    description  — Short description shown above the iframe (optional)
+    height       — iframe height in px, default 650 (optional)
+{% endcomment %}
+
+{% assign tool_height = include.height | default: "650" %}
+
+<div class="tool-section" role="complementary" aria-label="{{ include.title }}">
+  <div class="tool-section-header">
+    <h3>{{ include.title }}</h3>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span class="tool-badge">Interactive</span>
+      <a href="{{ include.src | relative_url }}"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="tool-open-link"
+         aria-label="Open {{ include.title }} in full screen">
+        Open full screen ↗
+      </a>
+    </div>
+  </div>
+  {% if include.description %}
+  <div class="tool-description">
+    {{ include.description }}
+  </div>
+  {% endif %}
+  <iframe
+    src="{{ include.src | relative_url }}"
+    class="tool-iframe"
+    height="{{ tool_height }}"
+    loading="lazy"
+    title="{{ include.title }}"
+    aria-label="{{ include.title }} interactive tool">
+    <p>Your browser does not support iframes.
+       <a href="{{ include.src | relative_url }}">Open the tool directly</a>.
+    </p>
+  </iframe>
+</div>

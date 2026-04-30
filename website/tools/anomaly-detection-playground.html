@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Masterclass: Anomaly Detection Playground</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 0;
+            min-height: 800px;
+        }
+
+        .controls-panel {
+            background: #f8f9fa;
+            padding: 30px;
+            border-right: 1px solid #e9ecef;
+            overflow-y: auto;
+        }
+
+        .visualization-panel {
+            padding: 30px;
+            background: white;
+        }
+
+        .control-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .control-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 5px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9em;
+        }
+
+        .control-group input, .control-group select {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #e9ecef;
+            border-radius: 4px;
+            font-size: 0.9em;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .control-group input[type="range"] {
+            padding: 0;
+        }
+
+        .range-value {
+            font-size: 0.8em;
+            color: #6c757d;
+            text-align: right;
+        }
+
+        .pattern-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .pattern-btn {
+            padding: 8px 12px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: background-color 0.3s ease;
+        }
+
+        .pattern-btn:hover {
+            background: #5a6268;
+        }
+
+        .pattern-btn.active {
+            background: #667eea;
+        }
+
+        .algorithm-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .algorithm-option {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .algorithm-option:hover {
+            background: #e9ecef;
+        }
+
+        .algorithm-option.active {
+            border-color: #667eea;
+            background: #e3f2fd;
+        }
+
+        .algorithm-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .algorithm-info {
+            flex: 1;
+        }
+
+        .algorithm-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 2px;
+        }
+
+        .algorithm-desc {
+            font-size: 0.8em;
+            color: #6c757d;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-card h4 {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .metric-value {
+            font-size: 1.6em;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .metric-unit {
+            font-size: 0.7em;
+            opacity: 0.8;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+
+        .detection-results {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detection-results h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .anomaly-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .anomaly-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #ffeaa7;
+        }
+
+        .anomaly-item:last-child {
+            border-bottom: none;
+        }
+
+        .anomaly-time {
+            font-size: 0.8em;
+            color: #6c757d;
+        }
+
+        .anomaly-severity {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            font-weight: 600;
+        }
+
+        .severity-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .severity-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .severity-low {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .threshold-visualization {
+            background: #e8f5e8;
+            border: 1px solid #27ae60;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .threshold-visualization h4 {
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+
+        .threshold-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .tab.active {
+            background: white;
+            color: #2c3e50;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .scenario-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .scenario-btn {
+            padding: 10px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            text-align: left;
+            transition: background-color 0.3s ease;
+        }
+
+        .scenario-btn:hover {
+            background: #5a6268;
+        }
+
+        .scenario-btn.active {
+            background: #667eea;
+        }
+
+        .scenario-description {
+            font-size: 0.7em;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 300px 1fr;
+            }
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls-panel {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+                max-height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pattern-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .threshold-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .explanation {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .explanation h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        .explanation p {
+            color: #424242;
+            line-height: 1.4;
+            margin-bottom: 6px;
+            font-size: 0.9em;
+        }
+
+        .performance-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .performance-label {
+            font-size: 0.85em;
+            color: #495057;
+        }
+
+        .performance-bar {
+            flex: 1;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin: 0 10px;
+            overflow: hidden;
+        }
+
+        .performance-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            transition: width 0.3s ease;
+        }
+
+        .performance-value {
+            font-size: 0.8em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Anomaly Detection Playground</h1>
+            <p>Interactive exploration of anomaly detection algorithms with SAFE methodology</p>
+        </div>
+
+        <div class="main-content">
+            <div class="controls-panel">
+                <!-- Data Pattern Configuration -->
+                <div class="control-section">
+                    <h3>Data Pattern</h3>
+                    
+                    <div class="pattern-buttons">
+                        <button class="pattern-btn active" data-pattern="normal">Normal Traffic</button>
+                        <button class="pattern-btn" data-pattern="seasonal">Seasonal Pattern</button>
+                        <button class="pattern-btn" data-pattern="trending">Trending Growth</button>
+                        <button class="pattern-btn" data-pattern="spike">Traffic Spikes</button>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="noiseLevel">Noise Level</label>
+                        <input type="range" id="noiseLevel" min="0" max="100" value="20">
+                        <div class="range-value" id="noiseLevelValue">20%</div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="seasonality">Seasonality Strength</label>
+                        <input type="range" id="seasonality" min="0" max="100" value="30">
+                        <div class="range-value" id="seasonalityValue">30%</div>
+                    </div>
+                </div>
+
+                <!-- SAFE Algorithm Selection -->
+                <div class="control-section">
+                    <h3>SAFE Algorithm</h3>
+                    
+                    <div class="algorithm-selector">
+                        <div class="algorithm-option active" data-algorithm="safe">
+                            <input type="radio" name="algorithm" value="safe" checked>
+                            <div class="algorithm-info">
+                                <div class="algorithm-name">SAFE Detection</div>
+                                <div class="algorithm-desc">Seasonal, Automated, Fast, Effective</div>
+                            </div>
+                        </div>
+                        
+                        <div class="algorithm-option" data-algorithm="statistical">
+                            <input type="radio" name="algorithm" value="statistical">
+                            <div class="algorithm-info">
+                                <div class="algorithm-name">Statistical Bounds</div>
+                                <div class="algorithm-desc">Standard deviation thresholds</div>
+                            </div>
+                        </div>
+                        
+                        <div class="algorithm-option" data-algorithm="isolation">
+                            <input type="radio" name="algorithm" value="isolation">
+                            <div class="algorithm-info">
+                                <div class="algorithm-name">Isolation Forest</div>
+                                <div class="algorithm-desc">Machine learning approach</div>
+                            </div>
+                        </div>
+                        
+                        <div class="algorithm-option" data-algorithm="lstm">
+                            <input type="radio" name="algorithm" value="lstm">
+                            <div class="algorithm-info">
+                                <div class="algorithm-name">LSTM Neural Net</div>
+                                <div class="algorithm-desc">Deep learning prediction</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Threshold Tuning -->
+                <div class="control-section">
+                    <h3>Threshold Tuning</h3>
+                    
+                    <div class="control-group">
+                        <label for="sensitivity">Sensitivity</label>
+                        <input type="range" id="sensitivity" min="1" max="10" value="5">
+                        <div class="range-value" id="sensitivityValue">5 (Medium)</div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="lookback">Lookback Window</label>
+                        <select id="lookback">
+                            <option value="24">24 hours</option>
+                            <option value="168" selected>7 days</option>
+                            <option value="720">30 days</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="minAnomaly">Min Anomaly Duration</label>
+                        <select id="minAnomaly">
+                            <option value="1">1 minute</option>
+                            <option value="5" selected>5 minutes</option>
+                            <option value="15">15 minutes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Scenario Testing -->
+                <div class="control-section">
+                    <h3>Test Scenarios</h3>
+                    
+                    <div class="scenario-buttons">
+                        <button class="scenario-btn active" data-scenario="normal">
+                            Normal Operations
+                            <div class="scenario-description">Typical traffic patterns</div>
+                        </button>
+                        <button class="scenario-btn" data-scenario="gradual">
+                            Gradual Degradation
+                            <div class="scenario-description">Slow performance decline</div>
+                        </button>
+                        <button class="scenario-btn" data-scenario="sudden">
+                            Sudden Spike
+                            <div class="scenario-description">Traffic surge event</div>
+                        </button>
+                        <button class="scenario-btn" data-scenario="intermittent">
+                            Intermittent Issues
+                            <div class="scenario-description">Periodic failures</div>
+                        </button>
+                        <button class="scenario-btn" data-scenario="deployment">
+                            Deployment Impact
+                            <div class="scenario-description">Release-related changes</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="control-section">
+                    <h3>Algorithm Performance</h3>
+                    
+                    <div class="performance-indicator">
+                        <span class="performance-label">Precision</span>
+                        <div class="performance-bar">
+                            <div class="performance-fill" id="precisionBar" style="width: 85%"></div>
+                        </div>
+                        <span class="performance-value" id="precisionValue">85%</span>
+                    </div>
+                    
+                    <div class="performance-indicator">
+                        <span class="performance-label">Recall</span>
+                        <div class="performance-bar">
+                            <div class="performance-fill" id="recallBar" style="width: 78%"></div>
+                        </div>
+                        <span class="performance-value" id="recallValue">78%</span>
+                    </div>
+                    
+                    <div class="performance-indicator">
+                        <span class="performance-label">F1 Score</span>
+                        <div class="performance-bar">
+                            <div class="performance-fill" id="f1Bar" style="width: 81%"></div>
+                        </div>
+                        <span class="performance-value" id="f1Value">81%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visualization-panel">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h4>Anomalies Detected</h4>
+                        <div class="metric-value" id="anomaliesDetected">12</div>
+                        <div class="metric-unit">in last 24h</div>
+                    </div>
+                    <div class="metric-card">
+                        <h4>False Positive Rate</h4>
+                        <div class="metric-value" id="falsePositiveRate">3.2</div>
+                        <div class="metric-unit">%</div>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Detection Latency</h4>
+                        <div class="metric-value" id="detectionLatency">2.4</div>
+                        <div class="metric-unit">minutes</div>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Confidence Score</h4>
+                        <div class="metric-value" id="confidenceScore">94.7</div>
+                        <div class="metric-unit">%</div>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab active" data-tab="timeseries">Time Series</button>
+                    <button class="tab" data-tab="distribution">Distribution</button>
+                    <button class="tab" data-tab="correlation">Correlation</button>
+                </div>
+
+                <div class="tab-content active" id="timeseries">
+                    <div class="chart-container">
+                        <canvas id="timeseriesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="distribution">
+                    <div class="chart-container">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="correlation">
+                    <div class="chart-container">
+                        <canvas id="correlationChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="detection-results">
+                    <h4>Recent Anomalies</h4>
+                    <div class="anomaly-list" id="anomalyList">
+                        <!-- Anomalies will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="explanation">
+                    <h4 id="algorithmTitle">SAFE Algorithm Explanation</h4>
+                    <p id="algorithmDescription">
+                        SAFE (Seasonal, Automated, Fast, Effective) combines seasonal decomposition with automated threshold adjustment. 
+                        It identifies patterns in historical data and adapts thresholds based on time of day, day of week, and seasonal trends.
+                    </p>
+                    <p id="algorithmBenefits">
+                        Benefits: Reduces false positives from expected seasonal variations, automatically adapts to changing patterns, 
+                        provides fast detection suitable for real-time monitoring.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let timeseriesChart, distributionChart, correlationChart;
+        let currentData = [];
+        let anomalies = [];
+
+        // Algorithm configurations
+        const algorithms = {
+            safe: {
+                name: "SAFE Detection",
+                description: "SAFE (Seasonal, Automated, Fast, Effective) combines seasonal decomposition with automated threshold adjustment. It identifies patterns in historical data and adapts thresholds based on time of day, day of week, and seasonal trends.",
+                benefits: "Benefits: Reduces false positives from expected seasonal variations, automatically adapts to changing patterns, provides fast detection suitable for real-time monitoring.",
+                precision: 85,
+                recall: 78,
+                f1: 81
+            },
+            statistical: {
+                name: "Statistical Bounds",
+                description: "Uses statistical methods like standard deviation and z-scores to identify outliers. Sets upper and lower bounds based on historical mean and variance.",
+                benefits: "Benefits: Simple to understand and implement, computationally efficient, works well with normally distributed data.",
+                precision: 72,
+                recall: 89,
+                f1: 80
+            },
+            isolation: {
+                name: "Isolation Forest",
+                description: "Machine learning algorithm that isolates anomalies by randomly selecting features and split values. Anomalies are easier to isolate and require fewer splits.",
+                benefits: "Benefits: No assumptions about data distribution, handles high-dimensional data well, unsupervised learning approach.",
+                precision: 88,
+                recall: 71,
+                f1: 79
+            },
+            lstm: {
+                name: "LSTM Neural Network",
+                description: "Deep learning approach using Long Short-Term Memory networks to learn temporal patterns and predict future values. Anomalies are points that deviate significantly from predictions.",
+                benefits: "Benefits: Captures complex temporal dependencies, adapts to evolving patterns, excellent for time-series forecasting.",
+                precision: 91,
+                recall: 68,
+                f1: 77
+            }
+        };
+
+        // Data generation functions
+        function generateTimeSeriesData(pattern, hours = 48) {
+            const data = [];
+            const labels = [];
+            const now = new Date();
+            
+            for (let i = hours * 60; i >= 0; i -= 5) {
+                const timestamp = new Date(now.getTime() - i * 60000);
+                labels.push(timestamp.toLocaleTimeString());
+                
+                let value = generateDataPoint(timestamp, pattern, i);
+                data.push(value);
+            }
+            
+            return { labels, data };
+        }
+
+        function generateDataPoint(timestamp, pattern, minutesAgo) {
+            const hour = timestamp.getHours();
+            const dayOfWeek = timestamp.getDay();
+            const noiseLevel = parseInt(document.getElementById('noiseLevel').value) / 100;
+            const seasonality = parseInt(document.getElementById('seasonality').value) / 100;
+            
+            let baseValue = 100;
+            
+            // Apply pattern-specific logic
+            switch (pattern) {
+                case 'seasonal':
+                    baseValue += Math.sin((hour * Math.PI) / 12) * 30 * seasonality;
+                    baseValue += Math.sin((dayOfWeek * Math.PI) / 3.5) * 15 * seasonality;
+                    break;
+                case 'trending':
+                    baseValue += (minutesAgo / 1440) * 20; // Growth over time
+                    break;
+                case 'spike':
+                    if (minutesAgo < 60 && minutesAgo > 30) {
+                        baseValue += 150; // Spike 30-60 minutes ago
+                    }
+                    break;
+            }
+            
+            // Add noise
+            baseValue += (Math.random() - 0.5) * baseValue * noiseLevel;
+            
+            return Math.max(0, baseValue);
+        }
+
+        // Anomaly detection simulation
+        function detectAnomalies(data, algorithm) {
+            const detectedAnomalies = [];
+            const sensitivity = parseInt(document.getElementById('sensitivity').value);
+            const threshold = (11 - sensitivity) * 10; // Higher sensitivity = lower threshold
+            
+            // Simple anomaly detection simulation
+            for (let i = 10; i < data.length; i++) {
+                const recent = data.slice(i - 10, i);
+                const mean = recent.reduce((a, b) => a + b) / recent.length;
+                const variance = recent.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / recent.length;
+                const stdDev = Math.sqrt(variance);
+                
+                const deviation = Math.abs(data[i] - mean) / stdDev;
+                
+                if (deviation > threshold / 10) {
+                    const severity = deviation > 3 ? 'high' : deviation > 2 ? 'medium' : 'low';
+                    detectedAnomalies.push({
+                        index: i,
+                        value: data[i],
+                        severity: severity,
+                        confidence: Math.min(99, deviation * 20)
+                    });
+                }
+            }
+            
+            return detectedAnomalies;
+        }
+
+        // Chart initialization
+        function initCharts() {
+            const ctx1 = document.getElementById('timeseriesChart').getContext('2d');
+            const ctx2 = document.getElementById('distributionChart').getContext('2d');
+            const ctx3 = document.getElementById('correlationChart').getContext('2d');
+
+            timeseriesChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Metric Value',
+                        data: [],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.1
+                    }, {
+                        label: 'Anomalies',
+                        data: [],
+                        borderColor: '#e74c3c',
+                        backgroundColor: '#e74c3c',
+                        borderWidth: 0,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        showLine: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            },
+                            ticks: {
+                                maxTicksLimit: 10
+                            }
+                        }
+                    }
+                }
+            });
+
+            distributionChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Normal Distribution',
+                        data: [],
+                        backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                        borderColor: '#667eea',
+                        borderWidth: 1
+                    }, {
+                        label: 'Anomalies',
+                        data: [],
+                        backgroundColor: 'rgba(231, 76, 60, 0.6)',
+                        borderColor: '#e74c3c',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            correlationChart = new Chart(ctx3, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Normal Values',
+                        data: [],
+                        backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                        borderColor: '#667eea'
+                    }, {
+                        label: 'Anomalies',
+                        data: [],
+                        backgroundColor: 'rgba(231, 76, 60, 0.8)',
+                        borderColor: '#e74c3c'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time Index'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Metric Value'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update all visualizations
+        function updateVisualization() {
+            const pattern = document.querySelector('.pattern-btn.active').dataset.pattern;
+            const algorithm = document.querySelector('.algorithm-option.active').dataset.algorithm;
+            
+            // Generate new data
+            const timeSeriesData = generateTimeSeriesData(pattern);
+            currentData = timeSeriesData.data;
+            
+            // Detect anomalies
+            anomalies = detectAnomalies(currentData, algorithm);
+            
+            // Update charts
+            updateTimeSeriesChart(timeSeriesData);
+            updateDistributionChart();
+            updateCorrelationChart();
+            
+            // Update metrics
+            updateMetrics();
+            updateAnomalyList();
+            updatePerformanceMetrics(algorithm);
+        }
+
+        function updateTimeSeriesChart(timeSeriesData) {
+            timeseriesChart.data.labels = timeSeriesData.labels;
+            timeseriesChart.data.datasets[0].data = currentData;
+            
+            // Add anomaly points
+            const anomalyPoints = new Array(currentData.length).fill(null);
+            anomalies.forEach(anomaly => {
+                anomalyPoints[anomaly.index] = anomaly.value;
+            });
+            timeseriesChart.data.datasets[1].data = anomalyPoints;
+            
+            timeseriesChart.update();
+        }
+
+        function updateDistributionChart() {
+            // Create histogram
+            const bins = 20;
+            const min = Math.min(...currentData);
+            const max = Math.max(...currentData);
+            const binSize = (max - min) / bins;
+            
+            const histogram = new Array(bins).fill(0);
+            const anomalyHistogram = new Array(bins).fill(0);
+            const labels = [];
+            
+            for (let i = 0; i < bins; i++) {
+                labels.push(`${(min + i * binSize).toFixed(1)}`);
+            }
+            
+            currentData.forEach((value, index) => {
+                const binIndex = Math.min(Math.floor((value - min) / binSize), bins - 1);
+                const isAnomaly = anomalies.some(a => a.index === index);
+                
+                if (isAnomaly) {
+                    anomalyHistogram[binIndex]++;
+                } else {
+                    histogram[binIndex]++;
+                }
+            });
+            
+            distributionChart.data.labels = labels;
+            distributionChart.data.datasets[0].data = histogram;
+            distributionChart.data.datasets[1].data = anomalyHistogram;
+            distributionChart.update();
+        }
+
+        function updateCorrelationChart() {
+            const normalPoints = [];
+            const anomalyPoints = [];
+            
+            currentData.forEach((value, index) => {
+                const point = { x: index, y: value };
+                const isAnomaly = anomalies.some(a => a.index === index);
+                
+                if (isAnomaly) {
+                    anomalyPoints.push(point);
+                } else {
+                    normalPoints.push(point);
+                }
+            });
+            
+            correlationChart.data.datasets[0].data = normalPoints;
+            correlationChart.data.datasets[1].data = anomalyPoints;
+            correlationChart.update();
+        }
+
+        function updateMetrics() {
+            document.getElementById('anomaliesDetected').textContent = anomalies.length;
+            
+            const totalPoints = currentData.length;
+            const falsePositiveRate = Math.max(0, (anomalies.length - 3) / totalPoints * 100);
+            document.getElementById('falsePositiveRate').textContent = falsePositiveRate.toFixed(1);
+            
+            const detectionLatency = 2 + Math.random() * 3;
+            document.getElementById('detectionLatency').textContent = detectionLatency.toFixed(1);
+            
+            const confidence = Math.max(70, 100 - falsePositiveRate * 5);
+            document.getElementById('confidenceScore').textContent = confidence.toFixed(1);
+        }
+
+        function updateAnomalyList() {
+            const anomalyList = document.getElementById('anomalyList');
+            anomalyList.innerHTML = '';
+            
+            if (anomalies.length === 0) {
+                anomalyList.innerHTML = '<div style="text-align: center; color: #6c757d;">No anomalies detected</div>';
+                return;
+            }
+            
+            anomalies.slice(-10).reverse().forEach((anomaly, index) => {
+                const timeAgo = `${index * 5 + 5} min ago`;
+                const anomalyDiv = document.createElement('div');
+                anomalyDiv.className = 'anomaly-item';
+                anomalyDiv.innerHTML = `
+                    <span>Value: ${anomaly.value.toFixed(1)}</span>
+                    <span class="anomaly-time">${timeAgo}</span>
+                    <span class="anomaly-severity severity-${anomaly.severity}">${anomaly.severity.toUpperCase()}</span>
+                `;
+                anomalyList.appendChild(anomalyDiv);
+            });
+        }
+
+        function updatePerformanceMetrics(algorithm) {
+            const config = algorithms[algorithm];
+            
+            document.getElementById('precisionValue').textContent = config.precision + '%';
+            document.getElementById('precisionBar').style.width = config.precision + '%';
+            
+            document.getElementById('recallValue').textContent = config.recall + '%';
+            document.getElementById('recallBar').style.width = config.recall + '%';
+            
+            document.getElementById('f1Value').textContent = config.f1 + '%';
+            document.getElementById('f1Bar').style.width = config.f1 + '%';
+            
+            // Update algorithm explanation
+            document.getElementById('algorithmTitle').textContent = config.name + ' Explanation';
+            document.getElementById('algorithmDescription').textContent = config.description;
+            document.getElementById('algorithmBenefits').textContent = config.benefits;
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            updateVisualization();
+
+            // Pattern buttons
+            document.querySelectorAll('.pattern-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.pattern-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    updateVisualization();
+                });
+            });
+
+            // Algorithm selection
+            document.querySelectorAll('.algorithm-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.algorithm-option').forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                    this.querySelector('input[type="radio"]').checked = true;
+                    updateVisualization();
+                });
+            });
+
+            // Scenario buttons
+            document.querySelectorAll('.scenario-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    updateVisualization();
+                });
+            });
+
+            // Range sliders
+            document.getElementById('noiseLevel').addEventListener('input', function() {
+                document.getElementById('noiseLevelValue').textContent = this.value + '%';
+                updateVisualization();
+            });
+
+            document.getElementById('seasonality').addEventListener('input', function() {
+                document.getElementById('seasonalityValue').textContent = this.value + '%';
+                updateVisualization();
+            });
+
+            document.getElementById('sensitivity').addEventListener('input', function() {
+                const labels = ['Very Low', 'Low', 'Low-Med', 'Medium', 'Med-High', 'High', 'High+', 'Very High', 'Extreme', 'Maximum'];
+                document.getElementById('sensitivityValue').textContent = this.value + ' (' + labels[this.value - 1] + ')';
+                updateVisualization();
+            });
+
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Select/Lookback changes
+            document.getElementById('lookback').addEventListener('change', updateVisualization);
+            document.getElementById('minAnomaly').addEventListener('change', updateVisualization);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Role Responsibility Matrix</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 1400px;
+        }
+        h1 {
+            text-align: center;
+            color: #005f73;
+            margin-bottom: 30px;
+        }
+        .matrix {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        .category {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        .category h2 {
+            font-size: 1.8em;
+            color: #005f73;
+            margin-top: 0;
+            border-bottom: 2px solid #0a9396;
+            padding-bottom: 10px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #fff;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SRE Role Responsibility Matrix</h1>
+        <div class="matrix">
+            <div class="category">
+                <h2>Technical Responsibilities</h2>
+                <ul>
+                    <li>Service Monitoring & Alerting</li>
+                    <li>Incident Response & Troubleshooting</li>
+                    <li>Automation Development</li>
+                    <li>Capacity Planning</li>
+                    <li>System Design & Architecture</li>
+                    <li>Performance Tuning</li>
+                </ul>
+            </div>
+            <div class="category">
+                <h2>Organizational Responsibilities</h2>
+                <ul>
+                    <li>Cross-team Reliability Advocacy</li>
+                    <li>Post-incident Analysis & Learning</li>
+                    <li>On-call Participation & Improvement</li>
+                    <li>Platform Contribution</li>
+                    <li>Documentation & Runbooks</li>
+                    <li>Mentoring & Training</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

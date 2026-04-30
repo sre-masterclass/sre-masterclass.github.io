@@ -1,0 +1,25 @@
+<nav class="topnav" role="navigation" aria-label="Main navigation">
+  <!-- Brand -->
+  <a href="{{ '/' | relative_url }}" class="topnav-brand">
+    SRE Masterclass
+    <span class="brand-badge">Interactive</span>
+  </a>
+
+  <!-- Desktop links -->
+  <ul class="topnav-links" role="list">
+    <li><a href="{{ '/modules/' | relative_url }}">Course Map</a></li>
+    <li><a href="{{ '/modules/module-0/' | relative_url }}">Module 0</a></li>
+    <li><a href="{{ '/modules/module-1/' | relative_url }}">Module 1</a></li>
+    <li><a href="{{ '/modules/module-2/' | relative_url }}">Module 2</a></li>
+    <li>
+      <a href="{{ '/modules/module-0/0-1-business-value/' | relative_url }}" class="topnav-cta">
+        Start Learning →
+      </a>
+    </li>
+  </ul>
+
+  <!-- Mobile hamburger -->
+  <button class="hamburger" id="sidebar-toggle" aria-label="Toggle navigation" aria-expanded="false">
+    ☰
+  </button>
+</nav>

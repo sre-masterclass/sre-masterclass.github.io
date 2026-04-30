@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix: High-Velocity SRE Integration</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 95%;
+            max-width: 1600px;
+            background-color: #252526;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #e50914; /* Netflix Red */
+            border-bottom: 2px solid #e50914;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        .section {
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        h2 {
+            color: #9cdcfe;
+            margin-top: 0;
+            border-bottom: 1px solid #555;
+            padding-bottom: 8px;
+        }
+        ul {
+            list-style-type: '✓ ';
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .result-metric {
+            background-color: #2c2c2c;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .result-metric strong {
+            display: block;
+            font-size: 1.5em;
+            color: #4fcaf0;
+        }
+        .result-metric span {
+            font-size: 0.9em;
+            color: #aaa;
+        }
+        .source-footer {
+            text-align: right;
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Netflix: 1000+ Deployments Per Day</h1>
+        <p class="subtitle">A Case Study in High-Velocity, Reliable Development</p>
+        <div class="content-grid">
+            <div class="section">
+                <h2>Planning Integration</h2>
+                <ul>
+                    <li>Every feature spec includes reliability requirements & SLOs.</li>
+                    <li>Error budgets are allocated during quarterly planning.</li>
+                    <li>Chaos engineering experiments are scheduled alongside features.</li>
+                </ul>
+                <div class="source-footer">Source: Netflix Technology Blog, QCon Presentations</div>
+            </div>
+            <div class="section">
+                <h2>Development Integration</h2>
+                <ul>
+                    <li>Automated testing includes failure injection & performance validation.</li>
+                    <li>Feature flags enable gradual rollouts with reliability monitoring.</li>
+                    <li>Code reviews include a mandatory reliability impact assessment.</li>
+                </ul>
+                <div class="source-footer">Source: Netflix Engineering Culture Docs</div>
+            </div>
+            <div class="section">
+                <h2>Deployment Integration</h2>
+                <ul>
+                    <li>Canary deployments with automatic rollback based on SLO violations.</li>
+                    <li>Real-time reliability monitoring during all deployments.</li>
+                    <li>Automated capacity scaling based on deployment impact.</li>
+                </ul>
+                <div class="source-footer">Source: Netflix Deployment Automation Whitepaper</div>
+            </div>
+            <div class="section" style="grid-column: 1 / -1;">
+                <h2>Results Achieved</h2>
+                <div class="results-grid">
+                    <div class="result-metric">
+                        <strong>1000+</strong>
+                        <span>Deployments Per Day</span>
+                    </div>
+                    <div class="result-metric">
+                        <strong>99.99%</strong>
+                        <span>Availability</span>
+                    </div>
+                    <div class="result-metric">
+                        <strong>$10M+</strong>
+                        <span>Annual Savings from Incident Prevention</span>
+                    </div>
+                    <div class="result-metric">
+                        <strong>Culture</strong>
+                        <span>Reliability in Development DNA</span>
+                    </div>
+                </div>
+            </div>
+            <div class="section" style="grid-column: 1 / -1;">
+                <h2>Key Success Factors</h2>
+                <ul>
+                    <li>Executive support for a reliability-first culture.</li>
+                    <li>Heavily automated tooling to reduce SRE overhead on developers.</li>
+                    <li>Clear error budget policies with full product management buy-in.</li>
+                    <li>Continuous learning from production incidents feeds back into development.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

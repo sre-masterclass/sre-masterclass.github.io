@@ -1,0 +1,31 @@
+{% comment %}
+  Reusable visual diagram / dashboard embed.
+  Lighter weight than tool-embed — used for charts, diagrams, dashboards.
+
+  Usage:
+    {% include diagram-embed.html
+       title="ROI Framework Overview"
+       src="/modules/module-0/visuals/charts/roi-framework.html"
+       height="400"
+    %}
+
+  Parameters:
+    title  — diagram label shown in header (required)
+    src    — path to diagram HTML (required)
+    height — iframe height in px, default 420 (optional)
+{% endcomment %}
+
+{% assign diagram_height = include.height | default: "420" %}
+
+<div class="diagram-section" role="figure" aria-label="{{ include.title }}">
+  <div class="diagram-section-header">{{ include.title }}</div>
+  <iframe
+    src="{{ include.src | relative_url }}"
+    class="diagram-iframe"
+    height="{{ diagram_height }}"
+    loading="lazy"
+    title="{{ include.title }}"
+    scrolling="no">
+    <p><a href="{{ include.src | relative_url }}">View diagram</a></p>
+  </iframe>
+</div>

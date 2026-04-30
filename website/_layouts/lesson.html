@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include head.html %}
+</head>
+<body class="site-wrapper">
+
+  {% include nav.html %}
+
+  <div class="body-area">
+    {% include sidebar.html %}
+
+    <main class="main-content" id="main-content" role="main">
+      <!-- Reading progress indicator — fills as user scrolls -->
+      <div class="progress-bar-container" aria-hidden="true">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+
+      <div class="content-wrapper">
+
+        <!-- Lesson Header ───────────────────────────────────── -->
+        <header class="lesson-header">
+          <!-- Breadcrumb -->
+          <div class="lesson-breadcrumb">
+            <a href="{{ '/' | relative_url }}">Home</a>
+            <span class="separator">/</span>
+            <a href="{{ '/modules/' | relative_url }}">Course Map</a>
+            <span class="separator">/</span>
+            <a href="{{ '/modules/' | append: page.module_slug | append: '/' | relative_url }}">
+              {{ page.module_title }}
+            </a>
+            <span class="separator">/</span>
+            <span>{{ page.title }}</span>
+          </div>
+
+          <!-- Module badge -->
+          <span class="lesson-module-badge"
+                style="background: {{ page.module_color | default: 'var(--brand-primary)' }};">
+            {{ page.module_icon | default: "📚" }}
+            Module {{ page.module_number }} &middot; Lesson {{ page.lesson_number }}
+          </span>
+
+          <!-- Lesson title -->
+          <h1>{{ page.title }}</h1>
+
+          <!-- Meta row -->
+          <div class="lesson-meta">
+            {% if page.reading_time %}
+            <span>🕐 {{ page.reading_time }} min read</span>
+            {% endif %}
+            {% if page.difficulty %}
+            <span>⚡ {{ page.difficulty }}</span>
+            {% endif %}
+            {% if page.tools_count %}
+            <span>🛠️ {{ page.tools_count }} interactive tool{% if page.tools_count > 1 %}s{% endif %}</span>
+            {% endif %}
+          </div>
+        </header>
+        <!-- /Lesson Header ───────────────────────────────────── -->
+
+        <!-- Learning Objectives ─────────────────────────────── -->
+        {% if page.objectives %}
+        <div class="objectives-box">
+          <h3>📋 Learning Objectives</h3>
+          <ol>
+            {% for obj in page.objectives %}
+            <li>{{ obj }}</li>
+            {% endfor %}
+          </ol>
+        </div>
+        {% endif %}
+        <!-- /Learning Objectives ─────────────────────────────── -->
+
+        <!-- Main Lesson Content ────────────────────────────── -->
+        <article class="prose" id="lesson-content">
+          {{ content }}
+        </article>
+        <!-- /Main Lesson Content ────────────────────────────── -->
+
+        <!-- Lesson Navigation ──────────────────────────────── -->
+        {% include lesson-nav.html %}
+        <!-- /Lesson Navigation ──────────────────────────────── -->
+
+      </div><!-- /content-wrapper -->
+    </main>
+  </div><!-- /body-area -->
+
+  {% include footer.html %}
+
+</body>
+</html>

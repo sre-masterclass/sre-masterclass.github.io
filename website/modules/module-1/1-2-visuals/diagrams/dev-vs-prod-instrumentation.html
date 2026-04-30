@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instrumentation Strategy: Development vs. Production</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #111827; /* Equivalent to bg-gray-900 */
+            color: #F3F4F6; /* Equivalent to text-gray-200 */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1800px;
+            height: 90vh;
+            background-color: #1F2937; /* bg-gray-800 */
+            padding: 2rem;
+            border-radius: 0.5rem;
+            border: 1px solid #374151; /* border-gray-700 */
+        }
+        .panel {
+            background-color: #374151; /* bg-gray-700 */
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #4B5563; /* border-gray-600 */
+            padding-bottom: 0.5rem;
+        }
+        .overlay {
+            position: absolute;
+            bottom: 4rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #4B5563; /* border-gray-600 */
+            width: 80%;
+            max-width: 1200px;
+        }
+        .overlay-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Development Panel -->
+        <div class="panel">
+            <h2 class="panel-title text-green-400">Development Instrumentation</h2>
+            <p class="text-gray-400">Focus: Maximum detail, debugging ease. Assumes stable resources.</p>
+            <div class="mt-4 space-y-4">
+                <h3 class="text-lg font-semibold text-gray-300">Deep Instrumentation Example:</h3>
+                <pre class="bg-gray-900 p-4 rounded-md text-sm overflow-x-auto"><code># Comprehensive business logic metrics
+http_requests_total = Counter(
+    'http_requests_total',
+    'Total HTTP requests',
+    ['method', 'status', 'endpoint', 'user_type', 'region', 'version']
+)
+
+business_operations_total = Counter(
+    'business_operations_total',
+    'Business operations by type',
+    ['operation', 'result', 'customer_tier', 'payment_method', 'product_category']
+)</code></pre>
+            </div>
+        </div>
+
+        <!-- Production Panel -->
+        <div class="panel">
+            <h2 class="panel-title text-red-400">Production Instrumentation</h2>
+            <p class="text-gray-400">Focus: Reliability, performance, and cost-efficiency. Assumes resource contention.</p>
+            <div class="mt-4 space-y-4">
+                <h3 class="text-lg font-semibold text-gray-300">Shallow Instrumentation Example:</h3>
+                <pre class="bg-gray-900 p-4 rounded-md text-sm overflow-x-auto"><code># Essential HTTP metrics only
+http_requests_total = Counter(
+    'http_requests_total',
+    'Total HTTP requests',
+    ['method', 'status']
+)
+
+http_request_duration = Histogram(
+    'http_request_duration_seconds',
+    'HTTP request duration',
+    ['method']
+)</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Metrics Overlay -->
+    <div class="overlay">
+        <h3 class="overlay-title">Performance Metrics Overlay</h3>
+        <div class="grid grid-cols-2 gap-8 text-sm">
+            <!-- Metrics for Dev (Deep Instrumentation) -->
+            <div>
+                <h4 class="font-semibold text-green-400 mb-2">Deep Instrumentation Impact</h4>
+                <ul class="space-y-2">
+                    <li><span class="font-medium text-gray-300">Memory Usage:</span> 47MB</li>
+                    <li><span class="font-medium text-gray-300">CPU Overhead:</span> 1.2%</li>
+                    <li><span class="font-medium text-gray-300">Network Traffic:</span> 180KB/min</li>
+                    <li><span class="font-medium text-gray-300">Cardinality:</span> ~1,200 series</li>
+                </ul>
+            </div>
+            <!-- Metrics for Prod (Shallow Instrumentation) -->
+            <div>
+                <h4 class="font-semibold text-red-400 mb-2">Shallow Instrumentation Impact</h4>
+                <ul class="space-y-2">
+                    <li><span class="font-medium text-gray-300">Memory Usage:</span> 2.1MB</li>
+                    <li><span class="font-medium text-gray-300">CPU Overhead:</span> 0.08%</li>
+                    <li><span class="font-medium text-gray-300">Network Traffic:</span> 15KB/min</li>
+                    <li><span class="font-medium text-gray-300">Cardinality:</span> ~50 series</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

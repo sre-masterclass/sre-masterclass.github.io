@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include head.html %}
+</head>
+<body class="site-wrapper {% if page.no_sidebar %}no-sidebar{% endif %}">
+
+  {% include nav.html %}
+
+  <div class="body-area">
+    {% unless page.no_sidebar %}
+      {% include sidebar.html %}
+    {% endunless %}
+
+    <main class="main-content" id="main-content" role="main">
+      {{ content }}
+    </main>
+  </div>
+
+  {% include footer.html %}
+
+</body>
+</html>

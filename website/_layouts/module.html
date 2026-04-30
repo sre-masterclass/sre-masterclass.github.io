@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include head.html %}
+</head>
+<body class="site-wrapper">
+
+  {% include nav.html %}
+
+  <div class="body-area">
+    {% include sidebar.html %}
+
+    <main class="main-content" id="main-content" role="main">
+      <!-- Reading progress indicator -->
+      <div class="progress-bar-container" aria-hidden="true">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+
+      <div class="content-wrapper">
+        <!-- Module header -->
+        <header class="lesson-header">
+          <div class="lesson-breadcrumb">
+            <a href="{{ '/' | relative_url }}">Home</a>
+            <span class="separator">/</span>
+            <a href="{{ '/modules/' | relative_url }}">Course Map</a>
+            <span class="separator">/</span>
+            <span>{{ page.module_title }}</span>
+          </div>
+
+          <span class="lesson-module-badge" style="background: {{ page.module_color | default: 'var(--brand-primary)' }};">
+            {{ page.module_icon | default: "📚" }} Module {{ page.module_number }}
+          </span>
+
+          <h1>{{ page.title }}</h1>
+
+          {% if page.description %}
+          <p class="text-muted" style="font-size: 1.05rem; margin-top: 8px;">{{ page.description }}</p>
+          {% endif %}
+        </header>
+
+        <!-- Main content (lesson list, objectives, etc.) -->
+        <div class="prose">
+          {{ content }}
+        </div>
+      </div>
+    </main>
+  </div>
+
+  {% include footer.html %}
+
+</body>
+</html>

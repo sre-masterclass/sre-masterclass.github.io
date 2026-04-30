@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Masterclass: Incident Response Decision Tree</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        #decision-node {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        #node-text {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        #options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .option-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Incident Response Decision Tree</h1>
+            <p>Interactive incident response methodology trainer</p>
+        </div>
+
+        <div class="main-content">
+            <div id="decision-node">
+                <p id="node-text">Initial node text.</p>
+                <div id="options">
+                    <!-- Options will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const nodeText = document.getElementById('node-text');
+        const optionsContainer = document.getElementById('options');
+
+        const decisionTree = {
+            start: {
+                text: "You receive an alert: 'High latency on checkout service'. What's your first step?",
+                options: [
+                    { text: "Check service dashboard", next: "dashboard" },
+                    { text: "Rollback last deployment", next: "rollback" }
+                ]
+            },
+            dashboard: {
+                text: "Dashboard shows high CPU and memory usage. What's next?",
+                options: [
+                    { text: "Analyze logs for errors", next: "logs" },
+                    { text: "Scale up service instances", next: "scale" }
+                ]
+            },
+            rollback: {
+                text: "You rolled back the last deployment. The issue persists. What now?",
+                options: [
+                    { text: "Check service dashboard", next: "dashboard" },
+                    { text: "Declare a major incident", next: "declare_incident" }
+                ]
+            },
+            logs: {
+                text: "Logs show 'OutOfMemoryError'. You've found a potential root cause.",
+                options: [
+                    { text: "Increase memory allocation", next: "increase_memory" },
+                    { text: "Restart the service", next: "restart" }
+                ]
+            },
+            scale: {
+                text: "You scaled up the service. Latency has dropped, but costs are high. The issue is mitigated but not resolved.",
+                options: [
+                    { text: "Analyze logs for root cause", next: "logs" },
+                    { text: "Keep scaled up and monitor", next: "monitor" }
+                ]
+            },
+            declare_incident: {
+                text: "You've declared a major incident. The team is assembled. What's the focus?",
+                options: [
+                    { text: "Focus on mitigation", next: "mitigation" },
+                    { text: "Focus on root cause", next: "root_cause" }
+                ]
+            },
+            increase_memory: {
+                text: "You've increased memory allocation. The service has recovered. The incident is resolved.",
+                options: [
+                    { text: "Start over", next: "start" }
+                ]
+            },
+            restart: {
+                text: "You restarted the service. The issue is temporarily resolved, but will likely reoccur.",
+                options: [
+                    { text: "Increase memory allocation", next: "increase_memory" },
+                    { text: "Analyze logs for root cause", next: "logs" }
+                ]
+            },
+            monitor: {
+                text: "You continue to monitor the scaled-up service. The issue has not reoccurred, but the underlying problem is still unknown.",
+                options: [
+                    { text: "Analyze logs for root cause", next: "logs" },
+                    { text: "Start over", next: "start" }
+                ]
+            },
+            mitigation: {
+                text: "The team focuses on mitigation. The service is scaled up and latency returns to normal.",
+                options: [
+                    { text: "Focus on root cause", next: "root_cause" },
+                     { text: "Start over", next: "start" }
+                ]
+            },
+            root_cause: {
+                text: "The team focuses on root cause analysis. Logs show 'OutOfMemoryError'.",
+                options: [
+                    { text: "Increase memory allocation", next: "increase_memory" },
+                    { text: "Start over", next: "start" }
+                ]
+            }
+        };
+
+        function renderNode(nodeId) {
+            const node = decisionTree[nodeId];
+            nodeText.textContent = node.text;
+            optionsContainer.innerHTML = '';
+            node.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option.text;
+                button.className = 'option-btn';
+                button.addEventListener('click', () => renderNode(option.next));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        renderNode('start');
+    </script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Response Simulator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 1800px;
+        }
+        h1 {
+            text-align: center;
+            color: #005f73;
+            margin-bottom: 20px;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1.2em;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            background-color: #0a9396;
+            color: white;
+            margin: 0 10px;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+        .model-column {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        .model-column h2 {
+            font-size: 1.5em;
+            color: #fff;
+            margin-top: 0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .embedded h2 { background-color: #94d2bd; }
+        .centralized h2 { background-color: #ee9b00; }
+        .hybrid h2 { background-color: #ae2012; }
+        .log {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #fff;
+        }
+        .log p {
+            margin: 0 0 10px 0;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Live Incident Response Simulator</h1>
+        <div class="controls">
+            <button id="start-sim">Start Simulation</button>
+            <button id="reset-sim">Reset</button>
+        </div>
+        <div class="comparison">
+            <div class="model-column embedded">
+                <h2>Embedded Model</h2>
+                <div class="log" id="log-embedded"></div>
+            </div>
+            <div class="model-column centralized">
+                <h2>Centralized Model</h2>
+                <div class="log" id="log-centralized"></div>
+            </div>
+            <div class="model-column hybrid">
+                <h2>Hybrid Model</h2>
+                <div class="log" id="log-hybrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('start-sim');
+        const resetBtn = document.getElementById('reset-sim');
+        const logs = {
+            embedded: document.getElementById('log-embedded'),
+            centralized: document.getElementById('log-centralized'),
+            hybrid: document.getElementById('log-hybrid')
+        };
+
+        const events = {
+            embedded: [
+                { time: 1, msg: "ALERT: High latency on Payments service." },
+                { time: 3, msg: "Embedded SRE for Payments squad engaged." },
+                { time: 6, msg: "Diagnosis: Recent deployment caused DB connection leak." },
+                { time: 9, msg: "Decision: Rollback deployment. Notifying squad." },
+                { time: 12, msg: "Resolution: Service restored. Starting post-mortem." }
+            ],
+            centralized: [
+                { time: 2, msg: "ALERT: High latency detected across multiple services." },
+                { time: 5, msg: "Central SRE on-call paged." },
+                { time: 8, msg: "Platform team investigating shared infrastructure." },
+                { time: 12, msg: "Diagnosis: Network saturation in core data center." },
+                { time: 16, msg: "Resolution: Traffic rerouted. All services stable." }
+            ],
+            hybrid: [
+                { time: 1, msg: "ALERT: High latency on Payments service." },
+                { time: 4, msg: "Embedded SRE for Payments engaged. Initial check clear." },
+                { time: 7, msg: "Escalation: Platform SRE team engaged for infra check." },
+                { time: 11, msg: "Diagnosis: Combined effort reveals upstream dependency issue." },
+                { time: 15, msg: "Resolution: Platform team mitigates infra, embedded team validates service." }
+            ]
+        };
+
+        let intervalId;
+
+        function runSimulation() {
+            startBtn.disabled = true;
+            let time = 0;
+            intervalId = setInterval(() => {
+                time++;
+                for (const model in events) {
+                    events[model].forEach(event => {
+                        if (event.time === time) {
+                            const p = document.createElement('p');
+                            p.textContent = `[${time} min] ${event.msg}`;
+                            logs[model].appendChild(p);
+                            setTimeout(() => p.style.opacity = 1, 100);
+                            logs[model].scrollTop = logs[model].scrollHeight;
+                        }
+                    });
+                }
+                if (time > 20) {
+                    clearInterval(intervalId);
+                }
+            }, 1000);
+        }
+
+        function resetSimulation() {
+            clearInterval(intervalId);
+            startBtn.disabled = false;
+            for (const model in logs) {
+                logs[model].innerHTML = '';
+            }
+        }
+
+        startBtn.addEventListener('click', runSimulation);
+        resetBtn.addEventListener('click', resetSimulation);
+    </script>
+</body>
+</html>

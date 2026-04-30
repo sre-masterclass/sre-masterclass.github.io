@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cascading Failure Pattern Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 15px;
+        }
+        h1 {
+            text-align: center;
+            color: #e74c3c;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .controls button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+        }
+        #triggerBtn { background-color: #e67e22; color: white; }
+        #resetBtn { background-color: #3498db; color: white; }
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 15px;
+        }
+        .chart-panel {
+            background-color: #2c2c2c;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .chart-panel h2 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        .status-normal h2 { color: #2ecc71; }
+        .status-failure h2 { color: #e74c3c; }
+        .timeline {
+            grid-column: 1 / -1;
+            background-color: #2c2c2c;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .timeline h3 { margin-top: 0; color: #e67e22; }
+        .timeline-item { display: none; }
+    </style>
+</head>
+<body>
+    <h1>Live System Status: Multi-Service Architecture</h1>
+    <div class="controls">
+        <button id="triggerBtn">Trigger Cascading Failure</button>
+        <button id="resetBtn">Reset to Normal</button>
+    </div>
+    <div class="dashboard-container" id="dashboard">
+        <!-- Charts will be generated here -->
+    </div>
+    <div class="timeline">
+        <h3>Incident Timeline:</h3>
+        <div id="timeline-normal" class="timeline-item" style="display: block;">
+            <p><strong>Status:</strong> All systems normal. Predictive intelligence shows stable, correlated patterns.</p>
+        </div>
+        <div id="timeline-t0" class="timeline-item">
+            <p><strong>T+0s:</strong> Cascading failure initiated. Initial anomaly in Database CPU.</p>
+        </div>
+        <div id="timeline-t1" class="timeline-item">
+            <p><strong>T+30s:</strong> Pattern recognition detects correlation. Database CPU spike is causing Payment Service queue to grow. Predictive alert raised.</p>
+        </div>
+        <div id="timeline-t2" class="timeline-item">
+            <p><strong>T+90s:</strong> Failure cascades. Payment Service latency spikes. Checkout Service error rate begins to climb. Intelligent correlation links these events automatically.</p>
+        </div>
+    </div>
+
+    <script>
+        const dashboard = document.getElementById('dashboard');
+        const triggerBtn = document.getElementById('triggerBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        let charts = [];
+
+        const services = [
+            { name: 'API Gateway', normal: 50, failure: 150 },
+            { name: 'Payment Service', normal: 80, failure: 500 },
+            { name: 'Checkout Service', normal: 60, failure: 300 },
+            { name: 'Database', normal: 40, failure: 95 }
+        ];
+
+        function createChart(service, isFailure = false) {
+            const panel = document.createElement('div');
+            panel.className = 'chart-panel ' + (isFailure ? 'status-failure' : 'status-normal');
+            const title = document.createElement('h2');
+            title.textContent = `${service.name} - p95 Latency`;
+            const canvas = document.createElement('canvas');
+            panel.appendChild(title);
+            panel.appendChild(canvas);
+            dashboard.appendChild(panel);
+
+            const data = {
+                labels: ['-10m', '-5m', 'Now'],
+                datasets: [{
+                    label: 'Latency (ms)',
+                    data: isFailure ? [service.normal, service.normal * 1.2, service.failure] : [service.normal * 0.9, service.normal, service.normal * 1.1],
+                    borderColor: isFailure ? '#e74c3c' : '#2ecc71',
+                    tension: 0.4
+                }]
+            };
+
+            const chart = new Chart(canvas.getContext('2d'), {
+                type: 'line',
+                data: data,
+                options: {
+                    scales: { y: { beginAtZero: true } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+            charts.push(chart);
+        }
+
+        function renderDashboard(isFailure = false) {
+            dashboard.innerHTML = '';
+            charts.forEach(chart => chart.destroy());
+            charts = [];
+            services.forEach(service => createChart(service, isFailure));
+        }
+
+        function showTimelineStep(id) {
+            timelineItems.forEach(item => item.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
+        }
+
+        triggerBtn.addEventListener('click', () => {
+            renderDashboard(true);
+            showTimelineStep('timeline-t0');
+            setTimeout(() => showTimelineStep('timeline-t1'), 1500);
+            setTimeout(() => showTimelineStep('timeline-t2'), 3000);
+        });
+
+        resetBtn.addEventListener('click', () => {
+            renderDashboard(false);
+            showTimelineStep('timeline-normal');
+        });
+
+        // Initial render
+        renderDashboard(false);
+    </script>
+</body>
+</html>

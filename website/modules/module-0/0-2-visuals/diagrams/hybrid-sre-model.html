@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hybrid SRE Model (Google-style)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 1200px;
+        }
+        h1 {
+            text-align: center;
+            color: #005f73;
+            margin-bottom: 10px;
+        }
+        h2 {
+            text-align: center;
+            color: #0a9396;
+            margin-bottom: 30px;
+        }
+        svg {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hybrid SRE Model</h1>
+        <h2>(Google-style)</h2>
+        <svg viewBox="0 0 800 500">
+            <defs>
+                <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                    <feOffset dx="2" dy="2" result="offsetblur"/>
+                    <feComponentTransfer>
+                        <feFuncA type="linear" slope="0.5"/>
+                    </feComponentTransfer>
+                    <feMerge>
+                        <feMergeNode/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            </defs>
+
+            <!-- Central SRE Team -->
+            <g transform="translate(300, 20)">
+                <rect x="0" y="0" width="200" height="80" rx="10" fill="#ee9b00" stroke="#ca6702" stroke-width="2" filter="url(#shadow)"/>
+                <text x="100" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#fff">Central SRE</text>
+                <text x="100" y="60" text-anchor="middle" font-size="14" fill="#fff">Platform & Tooling</text>
+            </g>
+
+            <!-- Connecting Lines -->
+            <path d="M 400 100 V 180" stroke="#333" stroke-width="2" fill="none"/>
+            <path d="M 200 220 C 200 180, 400 180, 400 180" stroke="#333" stroke-width="2" fill="none"/>
+            <path d="M 600 220 C 600 180, 400 180, 400 180" stroke="#333" stroke-width="2" fill="none"/>
+
+            <!-- Product Group A -->
+            <g transform="translate(100, 220)">
+                <rect x="0" y="0" width="200" height="180" rx="10" fill="#f8f9fa" stroke="#94d2bd" stroke-width="2" filter="url(#shadow)"/>
+                <text x="100" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#005f73">Product Group A</text>
+                <rect x="20" y="60" width="160" height="40" rx="5" fill="#94d2bd"/>
+                <text x="100" y="85" text-anchor="middle">Dev Team</text>
+                <rect x="50" y="120" width="100" height="40" rx="5" fill="#e9d8a6"/>
+                <text x="100" y="145" text-anchor="middle" font-weight="bold">Embedded SRE</text>
+                <line x1="100" y1="100" x2="100" y2="120" stroke="#333" stroke-dasharray="4 2"/>
+            </g>
+
+            <!-- Product Group B -->
+            <g transform="translate(500, 220)">
+                <rect x="0" y="0" width="200" height="180" rx="10" fill="#f8f9fa" stroke="#94d2bd" stroke-width="2" filter="url(#shadow)"/>
+                <text x="100" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#005f73">Product Group B</text>
+                <rect x="20" y="60" width="160" height="40" rx="5" fill="#94d2bd"/>
+                <text x="100" y="85" text-anchor="middle">Dev Team</text>
+                <rect x="50" y="120" width="100" height="40" rx="5" fill="#e9d8a6"/>
+                <text x="100" y="145" text-anchor="middle" font-weight="bold">Embedded SRE</text>
+                <line x1="100" y1="100" x2="100" y2="120" stroke="#333" stroke-dasharray="4 2"/>
+            </g>
+
+            <text x="400" y="470" text-anchor="middle" font-size="16" font-style="italic">
+                Combines a central platform team for leverage with embedded SREs for product-specific expertise.
+            </text>
+        </svg>
+    </div>
+</body>
+</html>

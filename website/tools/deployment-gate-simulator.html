@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Masterclass: Deployment Gate Simulator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .panel h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        #gate-result {
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Deployment Gate Simulator</h1>
+            <p>Test deployment decisions under different conditions</p>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <h2>Gate Criteria</h2>
+                <div class="control-group">
+                    <label for="error-rate">Error Rate Threshold (%)</label>
+                    <input type="number" id="error-rate" value="1" step="0.1">
+                </div>
+                <div class="control-group">
+                    <label for="latency">Latency Threshold (ms)</label>
+                    <input type="number" id="latency" value="500">
+                </div>
+            </div>
+            <div class="panel">
+                <h2>System State</h2>
+                <div class="control-group">
+                    <label for="current-error-rate">Current Error Rate (%)</label>
+                    <input type="number" id="current-error-rate" value="0.5" step="0.1">
+                </div>
+                <div class="control-group">
+                    <label for="current-latency">Current Latency (ms)</label>
+                    <input type="number" id="current-latency" value="450">
+                </div>
+                <button id="check-gate-btn">Check Deployment Gate</button>
+            </div>
+        </div>
+        <div id="gate-result" style="margin: 0 30px 30px;">
+            Awaiting check...
+        </div>
+    </div>
+
+    <script>
+        const errorRateThresholdInput = document.getElementById('error-rate');
+        const latencyThresholdInput = document.getElementById('latency');
+        const currentErrorRateInput = document.getElementById('current-error-rate');
+        const currentLatencyInput = document.getElementById('current-latency');
+        const checkGateBtn = document.getElementById('check-gate-btn');
+        const gateResultEl = document.getElementById('gate-result');
+
+        function checkGate() {
+            const errorRateThreshold = parseFloat(errorRateThresholdInput.value);
+            const latencyThreshold = parseFloat(latencyThresholdInput.value);
+            const currentErrorRate = parseFloat(currentErrorRateInput.value);
+            const currentLatency = parseFloat(currentLatencyInput.value);
+
+            if (currentErrorRate < errorRateThreshold && currentLatency < latencyThreshold) {
+                gateResultEl.textContent = "GO: All checks passed.";
+                gateResultEl.style.backgroundColor = '#e8f5e8';
+                gateResultEl.style.color = '#27ae60';
+            } else {
+                gateResultEl.textContent = "NO-GO: A threshold was exceeded.";
+                gateResultEl.style.backgroundColor = '#ffebee';
+                gateResultEl.style.color = '#e74c3c';
+            }
+        }
+
+        checkGateBtn.addEventListener('click', checkGate);
+        checkGate(); // Initial check
+    </script>
+</body>
+</html>

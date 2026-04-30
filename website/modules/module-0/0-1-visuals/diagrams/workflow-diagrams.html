@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Collaboration Patterns</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 1600px; margin: auto; }
+        h1 { text-align: center; color: #2c3e50; }
+        .patterns-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-top: 20px; }
+        .pattern-card { background-color: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-top: 5px solid; }
+        .pattern1 { border-color: #3498db; }
+        .pattern2 { border-color: #e67e22; }
+        .pattern3 { border-color: #2ecc71; }
+        .pattern-card h2 { text-align: center; color: #34495e; padding: 15px; margin: 0; }
+        .pattern-card ul { list-style: none; padding: 0 20px 20px; margin: 0; font-size: 0.95em; line-height: 1.6; }
+        .pattern-card li { margin-bottom: 10px; }
+        .pattern-card strong { color: #2c3e50; }
+        .sdlc-note { font-size: 0.85em; color: #7f8c8d; margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cross-Functional Collaboration Patterns</h1>
+        <div class="patterns-grid">
+            <div class="pattern-card pattern1">
+                <h2>Pattern 1: Product Development Integration</h2>
+                <ul>
+                    <li><strong>What it looks like:</strong> SRE requirements in sprint planning, reliability stories in backlogs.</li>
+                    <li><strong>Key Interactions:</strong> Weekly reliability reviews, deployment readiness checks, capacity planning.</li>
+                    <li><strong>Success Metrics:</strong> 95%+ deployments meet reliability criteria, <2% deployment rollbacks.</li>
+                    <li><strong>Common Failure Modes:</strong> SRE as an afterthought, no reliability requirements, reactive only.</li>
+                    <li class="sdlc-note"><strong>SDLC Phase:</strong> Primarily impacts Planning, Development, and Testing.</li>
+                </ul>
+            </div>
+            <div class="pattern-card pattern2">
+                <h2>Pattern 2: Incident Response Coordination</h2>
+                <ul>
+                    <li><strong>What it looks like:</strong> Clear escalation paths, defined roles, automated runbooks.</li>
+                    <li><strong>Key Interactions:</strong> On-call rotations, post-incident reviews, knowledge sharing.</li>
+                    <li><strong>Success Metrics:</strong> <5 min detection, <15 min escalation, <30 min initial response.</li>
+                    <li><strong>Evolution Pattern:</strong> Manual &rarr; Semi-automated &rarr; Fully automated response workflows.</li>
+                    <li class="sdlc-note"><strong>SDLC Phase:</strong> A continuous feedback loop that informs all other phases.</li>
+                </ul>
+            </div>
+            <div class="pattern-card pattern3">
+                <h2>Pattern 3: Strategic Planning Alignment</h2>
+                <ul>
+                    <li><strong>What it looks like:</strong> SRE input on product roadmaps, reliability OKRs, executive reporting.</li>
+                    <li><strong>Key Interactions:</strong> Quarterly business reviews, capacity forecasting, risk assessments.</li>
+                    <li><strong>Success Metrics:</strong> Reliability requirements influence product decisions, executive visibility.</li>
+                    <li><strong>Executive Engagement:</strong> Monthly reliability dashboards, quarterly strategic reviews.</li>
+                    <li class="sdlc-note"><strong>SDLC Phase:</strong> Primarily impacts the initial Planning and Design phases.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

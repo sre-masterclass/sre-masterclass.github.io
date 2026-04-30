@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard: Instrumentation Performance Under Stress</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <style>
+        body { background-color: #111827; color: #F3F4F6; font-family: 'Inter', sans-serif; }
+        .control-button { transition: background-color 0.3s; }
+        .control-button.active { background-color: #4F46E5; } /* indigo-600 */
+        .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    </style>
+</head>
+<body class="p-4">
+    <h1 class="text-2xl font-bold text-center mb-4">Instrumentation Performance & Resource Pressure Analysis</h1>
+    
+    <div class="flex justify-center space-x-2 mb-4">
+        <button id="btn-normal" class="control-button bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Normal Operation</button>
+        <button id="btn-stress" class="control-button bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">CPU Stress Scenario</button>
+        <button id="btn-recovery" class="control-button bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Recovery Phase</button>
+    </div>
+
+    <div class="w-full max-w-screen-xl mx-auto bg-gray-800 rounded-lg shadow-xl p-4 border border-gray-700">
+        <!-- Shallow Instrumentation Section -->
+        <div class="mb-4">
+            <h2 class="text-xl font-semibold mb-2 text-blue-300">Shallow Instrumentation Performance</h2>
+            <div id="shallow-metrics" class="metric-grid">
+                <!-- Metrics will be populated by JS -->
+            </div>
+        </div>
+
+        <!-- Deep Instrumentation Section -->
+        <div>
+            <h2 class="text-xl font-semibold mb-2 text-yellow-300">Deep Instrumentation Performance</h2>
+            <div id="deep-metrics" class="metric-grid">
+                <!-- Metrics will be populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const shallowMetricsEl = document.getElementById('shallow-metrics');
+        const deepMetricsEl = document.getElementById('deep-metrics');
+        const buttons = {
+            normal: document.getElementById('btn-normal'),
+            stress: document.getElementById('btn-stress'),
+            recovery: document.getElementById('btn-recovery'),
+        };
+
+        const data = {
+            normal: {
+                shallow: { 'Memory Usage': '2.1MB', 'CPU Overhead': '0.08%', 'Network Traffic': '15KB/min', 'Metric Collection': 'Reliable' },
+                deep: { 'Memory Usage': '47MB', 'CPU Overhead': '1.2%', 'Network Traffic': '180KB/min', 'Metric Collection': 'Reliable' }
+            },
+            stress: {
+                shallow: { 'Memory Usage': '2.2MB', 'CPU Overhead': '0.15%', 'Network Traffic': '18KB/min', 'Metric Collection': 'Reliable' },
+                deep: { 'Memory Usage': '65MB', 'CPU Overhead': '4.8%', 'Network Traffic': '250KB/min', 'Metric Collection': 'Delayed/Dropped' }
+            },
+            recovery: {
+                shallow: { 'Memory Usage': '2.1MB', 'CPU Overhead': '0.09%', 'Network Traffic': '15KB/min', 'Metric Collection': 'Instant Recovery' },
+                deep: { 'Memory Usage': '52MB', 'CPU Overhead': '1.8%', 'Network Traffic': '200KB/min', 'Metric Collection': 'Gradual Recovery' }
+            }
+        };
+
+        function createMetricCard(label, value, isStressed = false) {
+            let valueColor = 'text-green-400';
+            if (isStressed) {
+                if (label === 'Metric Collection' && value.includes('Dropped')) valueColor = 'text-red-400';
+                else if (label === 'CPU Overhead' || label === 'Memory Usage') valueColor = 'text-yellow-400';
+            }
+            return `
+                <div class="bg-gray-900 p-3 rounded-lg text-center">
+                    <div class="text-sm text-gray-400">${label}</div>
+                    <div class="text-xl font-bold ${valueColor}">${value}</div>
+                </div>
+            `;
+        }
+
+        function updateDashboard(state) {
+            // Update button styles
+            Object.values(buttons).forEach(btn => btn.classList.remove('active'));
+            buttons[state].classList.add('active');
+
+            // Populate metrics
+            const shallowData = data[state].shallow;
+            const deepData = data[state].deep;
+            
+            shallowMetricsEl.innerHTML = Object.entries(shallowData).map(([label, value]) => createMetricCard(label, value, state === 'stress')).join('');
+            deepMetricsEl.innerHTML = Object.entries(deepData).map(([label, value]) => createMetricCard(label, value, state === 'stress')).join('');
+        }
+
+        buttons.normal.addEventListener('click', () => updateDashboard('normal'));
+        buttons.stress.addEventListener('click', () => updateDashboard('stress'));
+        buttons.recovery.addEventListener('click', () => updateDashboard('recovery'));
+
+        // Set initial state
+        updateDashboard('normal');
+    </script>
+</body>
+</html>

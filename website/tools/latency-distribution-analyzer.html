@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latency Distribution Analysis</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .metric-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+        }
+        
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .chart-container {
+            margin: 30px 0;
+            height: 400px;
+            position: relative;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .toggle-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .toggle-btn {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(155, 89, 182, 0.4);
+        }
+        
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+        
+        .explanation {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border-left: 5px solid #3498db;
+        }
+        
+        .explanation h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        
+        .prometheus-query {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        
+        .highlight-bad {
+            background: #ffebee;
+            border-left: 5px solid #f44336;
+        }
+        
+        .highlight-good {
+            background: #e8f5e8;
+            border-left: 5px solid #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 SRE Latency Metrics: Why Percentiles Matter</h1>
+        <div class="subtitle">Understanding Distribution vs Averages in Real-World Latency</div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>Scenario:</label>
+                <button onclick="setScenario('normal')">Normal Operation</button>
+            </div>
+            <div class="control-group">
+                <label>Chaos Engineering:</label>
+                <button onclick="setScenario('degraded')">Database Slowdown</button>
+            </div>
+            <div class="control-group">
+                <label>Incident:</label>
+                <button onclick="setScenario('outage')">Service Outage</button>
+            </div>
+        </div>
+        
+        <div class="toggle-controls">
+            <button class="toggle-btn" id="gaussianToggle" onclick="toggleGaussian()">Show Normal Distribution</button>
+            <button class="toggle-btn" id="stdevToggle" onclick="toggleStandardDeviations()">Show Standard Deviations</button>
+        </div>
+        
+        <div class="metrics-grid" id="metricsGrid">
+            <!-- Metrics will be populated by JavaScript -->
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="distributionChart"></canvas>
+        </div>
+        
+        <div class="explanation">
+            <h3>🎯 The Problem with Averages</h3>
+            <p>Look at the distribution above. Even when 95% of users have great experience (&lt;200ms), a few slow requests can make the average misleading. The <strong>95th percentile</strong> tells you what your worst 5% of users actually experience.</p>
+        </div>
+        
+        <div class="explanation highlight-good">
+            <h3>📊 Normal Distribution vs Reality</h3>
+            <p><strong>Toggle the "Show Normal Distribution" to see the difference!</strong></p>
+            <p>In statistics theory, if latency followed a <strong>normal (Gaussian) distribution</strong>:</p>
+            <ul>
+                <li><strong>68%</strong> of requests would be within ±1 standard deviation (μ ± 1σ)</li>
+                <li><strong>95%</strong> of requests would be within ±2 standard deviations (μ ± 2σ)</li>
+                <li><strong>99.7%</strong> of requests would be within ±3 standard deviations (μ ± 3σ)</li>
+            </ul>
+            <p><strong>But real latency distributions are NOT normal!</strong> They have long tails, outliers, and often multiple peaks. This is why we need percentiles, not just standard deviations.</p>
+        </div>
+        
+        <div class="explanation highlight-bad">
+            <h3>❌ Why This Query is Insufficient</h3>
+            <div class="prometheus-query">avg(http_request_latency_seconds{job='ecommerce-api'})</div>
+            <p><strong>Problems:</strong></p>
+            <ul>
+                <li>Hides outliers that affect real users</li>
+                <li>Can show "good" average while users suffer</li>
+                <li>Not suitable for SLO definitions</li>
+                <li>Doesn't reveal long-tail distribution</li>
+            </ul>
+        </div>
+        
+        <div class="explanation highlight-good">
+            <h3>✅ Why Histogram Percentiles Are Superior</h3>
+            <div class="prometheus-query">histogram_quantile(0.95, 
+  sum(rate(http_request_latency_seconds_bucket{job='ecommerce-api'}[1m])) 
+  by (le, endpoint)
+)</div>
+            <p><strong>Advantages:</strong></p>
+            <ul>
+                <li><strong>User-focused:</strong> Shows experience of worst 5% of users</li>
+                <li><strong>SLO-ready:</strong> Perfect for "95% of requests &lt; 500ms" targets</li>
+                <li><strong>Aggregatable:</strong> Works across multiple service instances</li>
+                <li><strong>Efficient:</strong> Pre-aggregated buckets, fast queries</li>
+                <li><strong>Alertable:</strong> Reliable threshold for meaningful alerts</li>
+            </ul>
+        </div>
+        
+        <div class="explanation">
+            <h3>📚 SRE Training Connection</h3>
+            <p>This query demonstrates multiple SRE concepts:</p>
+            <ul>
+                <li><strong>Module 1:</strong> RED metrics (Rate, Errors, Duration) - this covers Duration</li>
+                <li><strong>Module 2:</strong> SLI implementation using histogram percentiles</li>
+                <li><strong>Module 3:</strong> Advanced monitoring that reveals true user experience</li>
+                <li><strong>Module 4:</strong> Incident detection using percentile-based alerting</li>
+            </ul>
+        </div>
+        
+        <div class="explanation">
+            <h3>🔬 Statistical Deep Dive</h3>
+            <p><strong>Why 95th percentile ≈ μ + 2σ in normal distributions:</strong></p>
+            <p>In a perfect normal distribution, 95% of values fall within 2 standard deviations of the mean. However, <strong>real latency data is almost never normally distributed</strong>:</p>
+            <ul>
+                <li><strong>Right-skewed:</strong> Most requests are fast, but some are very slow (long tail)</li>
+                <li><strong>Bimodal:</strong> Cache hits vs cache misses create two distinct populations</li>
+                <li><strong>Bounded:</strong> Latency can't be negative, unlike normal distributions</li>
+            </ul>
+            <p>This is exactly why <strong>percentiles are more reliable than standard deviations</strong> for SRE work. Toggle between scenarios to see how the actual distribution compares to the theoretical normal curve!</p>
+        </div>
+    </div>
+
+    <script>
+        let chart;
+        let currentScenario = 'normal';
+        let showGaussian = false;
+        let showStandardDeviations = false;
+        let scenarios = {}; // Initialize empty object first
+        
+        // Simple exponential random for outliers - define this first
+        function exponentialRandom() {
+            return -Math.log(Math.random());
+        }
+        
+        function generateLatencyData(baseMean, maxLatency, outlierRate) {
+            const data = [];
+            
+            // Generate realistic latency distribution
+            for (let i = 0; i < 1000; i++) {
+                let latency;
+                if (Math.random() < outlierRate) {
+                    // Outliers - exponential distribution for long tail
+                    latency = baseMean + exponentialRandom() * (maxLatency - baseMean) * 0.5;
+                    latency = Math.min(latency, maxLatency);
+                } else {
+                    // Normal requests - log-normal-ish distribution
+                    const variation = Math.random() * baseMean * 0.8; // 80% variation
+                    latency = Math.max(10, baseMean - variation/2 + Math.random() * variation);
+                }
+                data.push(Math.round(latency));
+            }
+            
+            return data;
+        }
+        
+        // Initialize scenarios after the helper function is defined
+        function initializeScenarios() {
+            scenarios = {
+                normal: {
+                    name: 'Normal Operation',
+                    data: generateLatencyData(50, 150, 0.02), // mean=50ms, most requests fast
+                    outliers: 5,
+                    description: 'Healthy service with predictable latency'
+                },
+                degraded: {
+                    name: 'Database Slowdown',
+                    data: generateLatencyData(120, 300, 0.15), // mean=120ms, some slow queries
+                    outliers: 20,
+                    description: 'Some database queries taking longer'
+                },
+                outage: {
+                    name: 'Partial Service Outage',
+                    data: generateLatencyData(80, 500, 0.25), // bimodal: fast cache hits, slow retries
+                    outliers: 35,
+                    description: 'Cache hits fast, but timeouts affecting percentiles'
+                }
+            };
+        }
+        
+        function calculateStatistics(data) {
+            const n = data.length;
+            const mean = data.reduce((a, b) => a + b, 0) / n;
+            const variance = data.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / n;
+            const stdDev = Math.sqrt(variance);
+            
+            return { mean, stdDev, variance };
+        }
+        
+        function normalDistribution(x, mean, stdDev) {
+            const coefficient = 1 / (stdDev * Math.sqrt(2 * Math.PI));
+            const exponent = -0.5 * Math.pow((x - mean) / stdDev, 2);
+            return coefficient * Math.exp(exponent);
+        }
+        
+        function generateNormalCurve(mean, stdDev, dataCount) {
+            const points = [];
+            const range = 4 * stdDev; // Show ±4 standard deviations
+            const start = Math.max(0, mean - range);
+            const end = mean + range;
+            const step = (end - start) / 100;
+            
+            for (let x = start; x <= end; x += step) {
+                const y = normalDistribution(x, mean, stdDev) * dataCount * 50; // Scale for visualization
+                points.push({ x: Math.round(x), y: y });
+            }
+            
+            return points;
+        }
+        
+        function getStandardDeviationPoints(mean, stdDev) {
+            return {
+                minus2: mean - 2 * stdDev,
+                minus1: mean - stdDev,
+                mean: mean,
+                plus1: mean + stdDev,
+                plus2: mean + 2 * stdDev
+            };
+        }
+        
+        function calculateMetrics(data) {
+            const sorted = [...data].sort((a, b) => a - b);
+            const len = sorted.length;
+            
+            return {
+                avg: data.reduce((a, b) => a + b, 0) / len,
+                p50: sorted[Math.floor(len * 0.5)],
+                p95: sorted[Math.floor(len * 0.95)],
+                p99: sorted[Math.floor(len * 0.99)],
+                max: Math.max(...data),
+                count: len
+            };
+        }
+        
+        function toggleGaussian() {
+            showGaussian = !showGaussian;
+            const btn = document.getElementById('gaussianToggle');
+            if (showGaussian) {
+                btn.textContent = 'Hide Normal Distribution';
+                btn.classList.add('active');
+            } else {
+                btn.textContent = 'Show Normal Distribution';
+                btn.classList.remove('active');
+            }
+            
+            // Ensure scenarios are initialized
+            if (!scenarios || Object.keys(scenarios).length === 0) {
+                initializeScenarios();
+            }
+            
+            if (scenarios[currentScenario]) {
+                updateChart(scenarios[currentScenario]);
+            }
+        }
+        
+        function toggleStandardDeviations() {
+            showStandardDeviations = !showStandardDeviations;
+            const btn = document.getElementById('stdevToggle');
+            if (showStandardDeviations) {
+                btn.textContent = 'Hide Standard Deviations';
+                btn.classList.add('active');
+            } else {
+                btn.textContent = 'Show Standard Deviations';
+                btn.classList.remove('active');
+            }
+            
+            // Ensure scenarios are initialized
+            if (!scenarios || Object.keys(scenarios).length === 0) {
+                initializeScenarios();
+            }
+            
+            if (scenarios[currentScenario]) {
+                updateChart(scenarios[currentScenario]);
+            }
+        }
+        
+        function updateMetrics(scenario) {
+            const metrics = calculateMetrics(scenario.data);
+            const stats = calculateStatistics(scenario.data);
+            const grid = document.getElementById('metricsGrid');
+            
+            grid.innerHTML = `
+                <div class="metric-card">
+                    <h3>Average (μ)</h3>
+                    <div class="metric-value">${Math.round(metrics.avg)}ms</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Std Dev (σ)</h3>
+                    <div class="metric-value">${Math.round(stats.stdDev)}ms</div>
+                </div>
+                <div class="metric-card">
+                    <h3>50th Percentile</h3>
+                    <div class="metric-value">${Math.round(metrics.p50)}ms</div>
+                </div>
+                <div class="metric-card" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                    <h3>95th Percentile</h3>
+                    <div class="metric-value">${Math.round(metrics.p95)}ms</div>
+                </div>
+                <div class="metric-card">
+                    <h3>μ + 2σ (95%)</h3>
+                    <div class="metric-value">${Math.round(stats.mean + 2 * stats.stdDev)}ms</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Total Requests</h3>
+                    <div class="metric-value">${metrics.count}</div>
+                </div>
+            `;
+        }
+        
+        function createHistogram(data) {
+            const buckets = [0, 25, 50, 100, 200, 500, 1000, 2000, 5000];
+            const counts = new Array(buckets.length - 1).fill(0);
+            
+            data.forEach(latency => {
+                for (let i = 0; i < buckets.length - 1; i++) {
+                    if (latency >= buckets[i] && latency < buckets[i + 1]) {
+                        counts[i]++;
+                        break;
+                    }
+                }
+            });
+            
+            return {
+                labels: buckets.slice(0, -1).map((bucket, i) => 
+                    `${bucket}-${buckets[i + 1]}ms`
+                ),
+                counts: counts
+            };
+        }
+        
+        function updateChart(scenario) {
+            const histogram = createHistogram(scenario.data);
+            const metrics = calculateMetrics(scenario.data);
+            const stats = calculateStatistics(scenario.data);
+            const stdevPoints = getStandardDeviationPoints(stats.mean, stats.stdDev);
+            
+            if (chart) {
+                chart.destroy();
+            }
+            
+            // Prepare datasets
+            const datasets = [{
+                label: 'Actual Request Count',
+                data: histogram.counts,
+                backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                borderColor: 'rgba(52, 152, 219, 1)',
+                borderWidth: 2,
+                type: 'bar'
+            }];
+            
+            // Add Gaussian overlay if enabled
+            if (showGaussian) {
+                const normalCurve = generateNormalCurve(stats.mean, stats.stdDev, scenario.data.length);
+                const normalData = histogram.labels.map(label => {
+                    const bucketStart = parseInt(label.split('-')[0]);
+                    const bucketEnd = parseInt(label.split('-')[1]);
+                    const bucketMid = (bucketStart + bucketEnd) / 2;
+                    
+                    // Find closest normal curve point
+                    let closestPoint = normalCurve.reduce((prev, curr) => 
+                        Math.abs(curr.x - bucketMid) < Math.abs(prev.x - bucketMid) ? curr : prev
+                    );
+                    
+                    return closestPoint.y;
+                });
+                
+                datasets.push({
+                    label: 'Normal Distribution (μ=' + Math.round(stats.mean) + ', σ=' + Math.round(stats.stdDev) + ')',
+                    data: normalData,
+                    borderColor: 'rgba(231, 76, 60, 1)',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    borderWidth: 3,
+                    type: 'line',
+                    fill: false,
+                    tension: 0.4
+                });
+            }
+            
+            const ctx = document.getElementById('distributionChart').getContext('2d');
+            
+            // Build chart title with statistical info
+            let titleText = `${scenario.name} - Reality vs Theory`;
+            if (showStandardDeviations) {
+                titleText += ` | μ=${Math.round(stats.mean)}ms, σ=${Math.round(stats.stdDev)}ms, μ+2σ=${Math.round(stats.mean + 2*stats.stdDev)}ms`;
+            }
+            
+            // Build chart options
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: titleText,
+                        font: { size: 14, weight: 'bold' }
+                    },
+                    legend: {
+                        display: showGaussian,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Requests'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: showStandardDeviations ? 
+                                'Latency Buckets (Lines: Green=μ, Yellow=±1σ, Red=+2σ)' : 
+                                'Latency Buckets'
+                        }
+                    }
+                }
+            };
+            
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: histogram.labels,
+                    datasets: datasets
+                },
+                options: chartOptions
+            });
+            
+            // Add simple visual indicators for standard deviations if enabled
+            addStandardDeviationInfo(stdevPoints, stats);
+        }
+        
+        function addStandardDeviationInfo(stdevPoints, stats) {
+            // Add text annotations below the chart
+            const chartContainer = document.querySelector('.chart-container');
+            let infoDiv = document.getElementById('stdev-info');
+            
+            if (!infoDiv) {
+                infoDiv = document.createElement('div');
+                infoDiv.id = 'stdev-info';
+                infoDiv.style.marginTop = '10px';
+                infoDiv.style.padding = '10px';
+                infoDiv.style.backgroundColor = '#f8f9fa';
+                infoDiv.style.borderRadius = '5px';
+                infoDiv.style.fontSize = '0.9em';
+                chartContainer.appendChild(infoDiv);
+            }
+            
+            if (showStandardDeviations) {
+                infoDiv.innerHTML = `
+                    <strong>Standard Deviation Analysis:</strong><br>
+                    <span style="color: #2ecc71;">●</span> Mean (μ): ${Math.round(stats.mean)}ms<br>
+                    <span style="color: #f39c12;">●</span> μ - 1σ: ${Math.round(stdevPoints.minus1)}ms (16th percentile in normal dist.)<br>
+                    <span style="color: #f39c12;">●</span> μ + 1σ: ${Math.round(stdevPoints.plus1)}ms (84th percentile in normal dist.)<br>
+                    <span style="color: #e74c3c;">●</span> μ + 2σ: ${Math.round(stdevPoints.plus2)}ms (95th percentile in normal dist.)
+                `;
+                infoDiv.style.display = 'block';
+            } else {
+                infoDiv.style.display = 'none';
+            }
+        }
+        
+        function findBucketIndex(labels, value) {
+            for (let i = 0; i < labels.length; i++) {
+                const [start, end] = labels[i].split('-').map(x => parseInt(x));
+                if (value >= start && value < end) {
+                    return i;
+                }
+            }
+            return labels.length - 1; // Default to last bucket
+        }
+        
+        function setScenario(scenarioName) {
+            // Ensure scenarios are initialized
+            if (!scenarios || Object.keys(scenarios).length === 0) {
+                initializeScenarios();
+            }
+            
+            currentScenario = scenarioName;
+            const scenario = scenarios[scenarioName];
+            if (scenario) {
+                updateMetrics(scenario);
+                updateChart(scenario);
+            }
+        }
+        
+        // Initialize with normal scenario
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeScenarios();
+            setScenario('normal');
+        });
+    </script>
+</body>
+</html>

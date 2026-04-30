@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Masterclass: Pipeline SRE Integration Builder</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .panel h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        #pipeline-stages {
+            min-height: 400px;
+            border: 2px dashed #ccc;
+            padding: 10px;
+        }
+
+        .stage {
+            background: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            cursor: grab;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Pipeline SRE Integration Builder</h1>
+            <p>Interactive pipeline configuration for SRE integration</p>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <h2>Available Stages</h2>
+                <div id="available-stages">
+                    <div class="stage" draggable="true" data-stage="build">Build</div>
+                    <div class="stage" draggable="true" data-stage="test">Test</div>
+                    <div class="stage" draggable="true" data-stage="deploy-staging">Deploy to Staging</div>
+                    <div class="stage" draggable="true" data-stage="sre-gate">SRE Gate</div>
+                    <div class="stage" draggable="true" data-stage="deploy-prod">Deploy to Production</div>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>CI/CD Pipeline</h2>
+                <div id="pipeline-stages"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const stages = document.querySelectorAll('.stage');
+        const pipelineStages = document.getElementById('pipeline-stages');
+
+        stages.forEach(stage => {
+            stage.addEventListener('dragstart', e => {
+                e.dataTransfer.setData('text/plain', e.target.dataset.stage);
+            });
+        });
+
+        pipelineStages.addEventListener('dragover', e => {
+            e.preventDefault();
+        });
+
+        pipelineStages.addEventListener('drop', e => {
+            e.preventDefault();
+            const stageType = e.dataTransfer.getData('text/plain');
+            const newStage = document.createElement('div');
+            newStage.className = 'stage';
+            newStage.textContent = stageType.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            pipelineStages.appendChild(newStage);
+        });
+    </script>
+</body>
+</html>

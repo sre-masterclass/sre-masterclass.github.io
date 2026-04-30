@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Masterclass: Capacity Planning Simulator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .controls-panel {
+            background: #f8f9fa;
+            padding: 30px;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .visualization-panel {
+            padding: 30px;
+            background: white;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95em;
+        }
+
+        .control-group input, .control-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 500px;
+            margin-bottom: 20px;
+        }
+        
+        .explanation {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .explanation h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        .explanation p {
+            color: #424242;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Capacity Planning Simulator</h1>
+            <p>Interactive capacity planning and forecasting</p>
+        </div>
+
+        <div class="main-content">
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label for="initialCapacity">Initial Capacity (units)</label>
+                    <input type="number" id="initialCapacity" value="100" min="10">
+                </div>
+                <div class="control-group">
+                    <label for="growthRate">Growth Rate (% per month)</label>
+                    <input type="number" id="growthRate" value="10" min="0" max="100">
+                </div>
+                <div class="control-group">
+                    <label for="scalingThreshold">Auto-scaling Threshold (%)</label>
+                    <input type="number" id="scalingThreshold" value="80" min="50" max="95">
+                </div>
+                <div class="explanation">
+                    <h4>Capacity Planning</h4>
+                    <p>This tool simulates resource utilization over time based on growth projections, helping to plan for future capacity needs and avoid performance degradation.</p>
+                </div>
+            </div>
+
+            <div class="visualization-panel">
+                <div class="chart-container">
+                    <canvas id="capacityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const initialCapacityInput = document.getElementById('initialCapacity');
+        const growthRateInput = document.getElementById('growthRate');
+        const scalingThresholdInput = document.getElementById('scalingThreshold');
+        const ctx = document.getElementById('capacityChart').getContext('2d');
+        let capacityChart;
+
+        function simulateCapacity() {
+            const initialCapacity = parseInt(initialCapacityInput.value);
+            const growthRate = parseFloat(growthRateInput.value) / 100;
+            const scalingThreshold = parseFloat(scalingThresholdInput.value) / 100;
+
+            const labels = [];
+            const utilizationData = [];
+            const capacityData = [];
+            let currentUtilization = 50;
+            let currentCapacity = initialCapacity;
+
+            for (let i = 0; i < 24; i++) { // Simulate 24 months
+                labels.push(`Month ${i + 1}`);
+                
+                currentUtilization *= (1 + growthRate);
+                
+                if ((currentUtilization / currentCapacity) > scalingThreshold) {
+                    currentCapacity *= 1.5; // Scale up by 50%
+                }
+                
+                utilizationData.push(currentUtilization);
+                capacityData.push(currentCapacity);
+            }
+            
+            return { labels, utilizationData, capacityData };
+        }
+
+        function updateChart() {
+            const { labels, utilizationData, capacityData } = simulateCapacity();
+
+            if (capacityChart) {
+                capacityChart.destroy();
+            }
+
+            capacityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Utilization',
+                            data: utilizationData,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderWidth: 2,
+                            fill: true,
+                        },
+                        {
+                            label: 'Capacity',
+                            data: capacityData,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            stepped: true,
+                            fill: false,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        initialCapacityInput.addEventListener('change', updateChart);
+        growthRateInput.addEventListener('change', updateChart);
+        scalingThresholdInput.addEventListener('change', updateChart);
+
+        updateChart();
+    </script>
+</body>
+</html>

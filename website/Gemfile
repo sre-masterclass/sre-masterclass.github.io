@@ -1,0 +1,9 @@
+source "https://rubygems.org"
+
+# Pin to the GitHub Pages gem for compatibility
+gem "github-pages", group: :jekyll_plugins
+
+group :jekyll_plugins do
+  gem "jekyll-seo-tag"
+  gem "jekyll-sitemap"
+end

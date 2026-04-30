@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Masterclass - Implementation Complexity Comparison</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #161719; color: #d8d9da; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #f0f0f0; font-weight: 300; letter-spacing: 0.5px; }
+        .comparison-table { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
+        .column { background-color: #1f2123; border: 1px solid #333; border-radius: 5px; padding: 20px; }
+        .column h2 { margin-top: 0; font-size: 1.3em; color: #56a64b; border-bottom: 1px solid #444; padding-bottom: 10px; font-weight: 500; }
+        .attribute { margin-top: 15px; }
+        .attribute h3 { margin: 0 0 10px 0; font-size: 1.1em; color: #f98538; font-weight: 400; }
+        .attribute p { margin: 0; font-size: 0.95em; color: #bfbfbf; }
+    </style>
+</head>
+<body>
+    <h1>Implementation Complexity Analysis</h1>
+    <div class="comparison-table">
+        <div class="column">
+            <h2>USE Methodology</h2>
+            <div class="attribute">
+                <h3>Complexity</h3>
+                <p>High initial setup, requires deep system knowledge</p>
+            </div>
+            <div class="attribute">
+                <h3>Resource Requirements</h3>
+                <p>System-level access, kernel metrics, hardware monitoring</p>
+            </div>
+            <div class="attribute">
+                <h3>Operational Overhead</h3>
+                <p>Lower ongoing maintenance, stable metric patterns</p>
+            </div>
+            <div class="attribute">
+                <h3>Best For</h3>
+                <p>Infrastructure teams, system optimization, capacity planning</p>
+            </div>
+        </div>
+        <div class="column">
+            <h2>RED Methodology</h2>
+            <div class="attribute">
+                <h3>Complexity</h3>
+                <p>Medium setup, requires application instrumentation</p>
+            </div>
+            <div class="attribute">
+                <h3>Resource Requirements</h3>
+                <p>Application-level metrics, request tracing, error classification</p>
+            </div>
+            <div class="attribute">
+                <h3>Operational Overhead</h3>
+                <p>Medium maintenance, application changes affect metrics</p>
+            </div>
+            <div class="attribute">
+                <h3>Best For</h3>
+                <p>Application teams, performance optimization, service-level monitoring</p>
+            </div>
+        </div>
+        <div class="column">
+            <h2>Four Golden Signals</h2>
+            <div class="attribute">
+                <h3>Complexity</h3>
+                <p>Lower initial setup, focuses on user-visible metrics</p>
+            </div>
+            <div class="attribute">
+                <h3>Resource Requirements</h3>
+                <p>User journey instrumentation, business metric correlation</p>
+            </div>
+            <div class="attribute">
+                <h3>Operational Overhead</h3>
+                <p>Higher maintenance, requires business context alignment</p>
+            </div>
+            <div class="attribute">
+                <h3>Best For</h3>
+                <p>Product teams, user experience optimization, business impact correlation</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

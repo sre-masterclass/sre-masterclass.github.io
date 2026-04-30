@@ -1,0 +1,113 @@
+# SRE Masterclass — Jekyll Configuration
+# Hosted at: https://sre-masterclass.github.io
+
+title: "SRE Masterclass"
+description: "A hands-on, interactive course in Site Reliability Engineering — from strategic foundations to advanced monitoring, SLOs, and incident response."
+url: "https://sre-masterclass.github.io"
+baseurl: ""
+
+# Author
+author:
+  name: "SRE Masterclass"
+  email: ""
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+permalink: pretty
+
+# Sass/SCSS — not using Jekyll's built-in Sass pipeline (plain CSS for simplicity)
+
+# Plugins (whitelisted by GitHub Pages)
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Collections — not used but available for future expansion
+
+# Navigation structure — drives the sidebar and top nav
+course_modules:
+  - id: module-0
+    title: "Strategic Foundation"
+    slug: module-0
+    color: "#8b5cf6"
+    icon: "🧭"
+    lessons:
+      - id: 0-1
+        title: "Business Value Quantification"
+        slug: 0-1-business-value
+      - id: 0-2
+        title: "SRE Team Models & Responsibilities"
+        slug: 0-2-team-models
+      - id: 0-3
+        title: "SDLC Integration Points"
+        slug: 0-3-sdlc-integration
+      - id: 0-4
+        title: "Collaboration & Communication"
+        slug: 0-4-collaboration
+
+  - id: module-1
+    title: "Foundations of Monitoring"
+    slug: module-1
+    color: "#0ea5e9"
+    icon: "📡"
+    lessons:
+      - id: 1-1
+        title: "Monitoring Taxonomies Deep Dive"
+        slug: 1-1-monitoring-taxonomies
+      - id: 1-2
+        title: "Instrumentation Strategy & Implementation"
+        slug: 1-2-instrumentation
+      - id: 1-3
+        title: "Black Box vs White Box Monitoring"
+        slug: 1-3-black-box-vs-white-box
+      - id: 1-4
+        title: "Advanced Monitoring Patterns"
+        slug: 1-4-advanced-patterns
+      - id: 1-5
+        title: "Monitoring Architecture Design"
+        slug: 1-5-monitoring-architecture
+
+  - id: module-2
+    title: "SLO/SLI Mastery"
+    slug: module-2
+    color: "#10b981"
+    icon: "🎯"
+    lessons:
+      - id: 2-1
+        title: "SLO Definition Workshop"
+        slug: 2-1-slo-definition
+      - id: 2-2
+        title: "Latency Distribution & Statistical Analysis"
+        slug: 2-2-latency-distribution
+      - id: 2-3
+        title: "SLI Implementation Patterns"
+        slug: 2-3-sli-implementation
+      - id: 2-4
+        title: "Error Budget Mathematics & Burn Rate"
+        slug: 2-4-error-budget
+      - id: 2-5
+        title: "Advanced SLO Patterns"
+        slug: 2-5-advanced-slo
+      - id: 2-6
+        title: "Alerting Strategy & Burn Rate Implementation"
+        slug: 2-6-alerting-strategy
+      - id: 2-7
+        title: "SLO Governance & Organizational Maturity"
+        slug: 2-7-slo-governance
+      - id: 2-8
+        title: "Capacity Planning with SLO Integration"
+        slug: 2-8-capacity-planning
+
+# Exclude from build
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - .gitignore
+  - node_modules/
+  - vendor/
+
+# Include dotfiles
+include:
+  - .htaccess

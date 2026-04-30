@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Integration Across SDLC</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 1400px;
+        }
+        h1 {
+            text-align: center;
+            color: #005f73;
+            margin-bottom: 30px;
+        }
+        svg {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SRE Integration Across the Product Development Lifecycle</h1>
+        <svg viewBox="0 0 1200 400">
+            <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333" />
+                </marker>
+            </defs>
+
+            <!-- SDLC Stages -->
+            <g class="stage" transform="translate(50, 100)">
+                <rect x="0" y="0" width="200" height="80" rx="10" fill="#e9d8a6"/>
+                <text x="100" y="45" text-anchor="middle" font-size="18" font-weight="bold">Plan</text>
+            </g>
+            <g class="stage" transform="translate(300, 100)">
+                <rect x="0" y="0" width="200" height="80" rx="10" fill="#94d2bd"/>
+                <text x="100" y="45" text-anchor="middle" font-size="18" font-weight="bold">Develop</text>
+            </g>
+            <g class="stage" transform="translate(550, 100)">
+                <rect x="0" y="0" width="200" height="80" rx="10" fill="#0a9396"/>
+                <text x="100" y="45" text-anchor="middle" font-size="18" font-weight="bold" fill="white">Deploy</text>
+            </g>
+            <g class="stage" transform="translate(800, 100)">
+                <rect x="0" y="0" width="200" height="80" rx="10" fill="#005f73"/>
+                <text x="100" y="45" text-anchor="middle" font-size="18" font-weight="bold" fill="white">Operate</text>
+            </g>
+            <g class="stage" transform="translate(1050, 100)">
+                <rect x="0" y="0" width="100" height="80" rx="10" fill="#ae2012"/>
+                <text x="50" y="45" text-anchor="middle" font-size="18" font-weight="bold" fill="white">Learn</text>
+            </g>
+
+            <!-- Arrows -->
+            <line x1="250" y1="140" x2="300" y2="140" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="500" y1="140" x2="550" y2="140" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="750" y1="140" x2="800" y2="140" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="1000" y1="140" x2="1050" y2="140" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+            <path d="M 1100 180 Q 1150 250 1100 320 L 50 320 Q 0 250 50 180" fill="none" stroke="#333" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+
+            <!-- SRE Activities -->
+            <g class="sre-activity" transform="translate(50, 220)">
+                <text x="100" y="0" text-anchor="middle" font-weight="bold">SRE Integration:</text>
+                <text x="100" y="20" text-anchor="middle">- Reliability Requirements</text>
+                <text x="100" y="40" text-anchor="middle">- Capacity Planning</text>
+                <text x="100" y="60" text-anchor="middle">- SLO Definition</text>
+            </g>
+            <g class="sre-activity" transform="translate(300, 220)">
+                <text x="100" y="0" text-anchor="middle" font-weight="bold">SRE Integration:</text>
+                <text x="100" y="20" text-anchor="middle">- Instrumentation</text>
+                <text x="100" y="40" text-anchor="middle">- Code Reviews</text>
+                <text x="100" y="60" text-anchor="middle">- Testing for Failure</text>
+            </g>
+            <g class="sre-activity" transform="translate(550, 220)">
+                <text x="100" y="0" text-anchor="middle" font-weight="bold">SRE Integration:</text>
+                <text x="100" y="20" text-anchor="middle">- Deployment Gates</text>
+                <text x="100" y="40" text-anchor="middle">- Canary Analysis</text>
+                <text x="100" y="60" text-anchor="middle">- Automated Rollbacks</text>
+            </g>
+            <g class="sre-activity" transform="translate(800, 220)">
+                <text x="100" y="0" text-anchor="middle" font-weight="bold">SRE Integration:</text>
+                <text x="100" y="20" text-anchor="middle">- Monitoring & Alerting</text>
+                <text x="100" y="40" text-anchor="middle">- Incident Response</text>
+                <text x="100" y="60" text-anchor="middle">- On-call Rotations</text>
+            </g>
+             <g class="sre-activity" transform="translate(1050, 220)">
+                <text x="50" y="0" text-anchor="middle" font-weight="bold">SRE:</text>
+                <text x="50" y="20" text-anchor="middle">- Post-mortems</text>
+                <text x="50" y="40" text-anchor="middle">- Error Budget</text>
+                <text x="50" y="60" text-anchor="middle">  Review</text>
+            </g>
+        </svg>
+    </div>
+</body>
+</html>

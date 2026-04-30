@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment Impact Analysis Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #3498db;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .chart-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .summary-panel {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .summary-panel h3 {
+            margin-top: 0;
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .metric {
+            margin-bottom: 15px;
+        }
+        .metric-label {
+            font-weight: bold;
+        }
+        .metric-value {
+            float: right;
+        }
+        .status-ok { color: #2ecc71; }
+        .status-bad { color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <h1>Deployment Impact Analysis: Release v2.5.1</h1>
+    <div class="grid-container">
+        <div class="chart-container">
+            <canvas id="deploymentChart"></canvas>
+        </div>
+        <div class="summary-panel">
+            <h3>Performance Regression Analysis</h3>
+            <div class="metric">
+                <span class="metric-label">p95 Latency:</span>
+                <span class="metric-value status-bad">+18.5% (120ms → 142ms)</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Throughput:</span>
+                <span class="metric-value status-ok">-2.1% (4800 → 4700 rpm)</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Error Rate:</span>
+                <span class="metric-value status-bad">+150% (0.4% → 1.0%)</span>
+            </div>
+            <hr>
+            <h3>Automated Rollback Trigger</h3>
+            <p><strong>Status:</strong> <span class="status-bad">ACTIVATED</span></p>
+            <p><strong>Reason:</strong> p95 Latency increase > 10% and Error Rate spike > 2x baseline, sustained for 15 minutes.</p>
+            <p>This automated validation prevents risky deployments from causing prolonged user impact.</p>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('deploymentChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['-30m', '-20m', '-10m', 'Deploy', '+10m', '+20m', '+30m'],
+                datasets: [
+                    {
+                        label: 'p95 Latency (ms)',
+                        data: [120, 122, 119, 125, 135, 140, 142],
+                        borderColor: '#e74c3c',
+                        yAxisID: 'yLatency',
+                    },
+                    {
+                        label: 'Error Rate (%)',
+                        data: [0.4, 0.3, 0.4, 0.5, 0.8, 0.9, 1.0],
+                        borderColor: '#f39c12',
+                        yAxisID: 'yErrors',
+                    }
+                ]
+            },
+            options: {
+                plugins: {
+                    annotation: {
+                        annotations: {
+                            deploymentWindow: {
+                                type: 'box',
+                                xMin: 2.5,
+                                xMax: 3.5,
+                                backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                                borderColor: 'rgba(52, 152, 219, 0.5)',
+                                borderWidth: 1,
+                                label: {
+                                    content: 'Deployment Window',
+                                    enabled: true,
+                                    position: 'start'
+                                }
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    yLatency: {
+                        type: 'linear',
+                        position: 'left',
+                        title: { display: true, text: 'Latency (ms)' }
+                    },
+                    yErrors: {
+                        type: 'linear',
+                        position: 'right',
+                        title: { display: true, text: 'Error Rate (%)' },
+                        grid: { drawOnChartArea: false }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Masterclass - USE Methodology Dashboard</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #161719; color: #d8d9da; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #f0f0f0; font-weight: 300; letter-spacing: 0.5px; }
+        .dashboard { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 30px; }
+        .panel { background-color: #1f2123; border: 1px solid #333; border-radius: 5px; padding: 20px; }
+        .panel h2 { margin-top: 0; font-size: 1.3em; color: #56a64b; border-bottom: 1px solid #444; padding-bottom: 10px; font-weight: 500; }
+        .overlay { display: none; background-color: rgba(0,0,0,0.7); padding: 15px; border-radius: 5px; margin-top: 15px; }
+        .overlay.visible { display: block; }
+        .overlay h3 { color: #f98538; }
+        .overlay ul { list-style-type: none; padding-left: 0; }
+        .overlay li { margin-bottom: 10px; }
+        button { background-color: #f98538; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 1em; margin-top: 20px; }
+        footer { text-align: center; margin-top: 30px; font-size: 0.9em; color: #888; }
+    </style>
+</head>
+<body>
+    <h1>USE Methodology Dashboard (Resource-Focused Monitoring)</h1>
+    <div class="dashboard">
+        <div class="panel" id="use-panel">
+            <h2>System Resources</h2>
+            <!-- Real metrics would go here -->
+            <p>CPU Usage: 30%</p>
+            <p>Memory Consumption: 40%</p>
+            <p>Disk I/O: Minimal</p>
+            <button onclick="toggleOverlay()">Show USE Details</button>
+            <div class="overlay" id="use-overlay">
+                <h3>USE Methodology Landmarks</h3>
+                <ul>
+                    <li><strong>Utilization:</strong> Percentage of time the resource was busy (CPU usage, memory consumption, disk I/O)</li>
+                    <li><strong>Saturation:</strong> Degree of queuing or extra work that couldn't be processed (CPU run queue, memory swapping, disk queue depth)</li>
+                    <li><strong>Errors:</strong> Hardware/software errors from the resource perspective (disk errors, network drops, kernel errors)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        function toggleOverlay() {
+            const overlay = document.getElementById('use-overlay');
+            overlay.classList.toggle('visible');
+        }
+    </script>
+    <footer>
+        <p>Metrics shown are based on a technically validated simulation. See technical-validation.md for details.</p>
+    </footer>
+</body>
+</html>

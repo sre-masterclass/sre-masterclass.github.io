@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Split Monitoring Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1a202c;
+            color: #e2e8f0;
+            font-family: 'Roboto', sans-serif;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            padding: 1rem;
+        }
+        .panel {
+            background-color: #2d3748;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .panel-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #4a5568;
+            padding-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-grid">
+        <div class="panel">
+            <h2 class="panel-title"><i class="fas fa-user-secret"></i> Black Box Monitoring (External)</h2>
+            <div class="text-sm text-gray-400 mb-4">Simulates user experience from outside the system.</div>
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold">Service Availability</span>
+                        <span class="text-green-400 font-bold">100%</span>
+                    </div>
+                    <div class="w-full bg-gray-600 rounded-full h-2.5 mt-1">
+                        <div class="bg-green-500 h-2.5 rounded-full" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div>
+                    <span class="font-semibold">Avg. Response Time</span>
+                    <div class="text-2xl font-bold text-cyan-400">212ms</div>
+                </div>
+                <div>
+                    <span class="font-semibold">User Experience Score</span>
+                    <div class="text-2xl font-bold text-green-400">99.8/100</div>
+                </div>
+            </div>
+        </div>
+        <div class="panel">
+            <h2 class="panel-title"><i class="fas fa-cogs"></i> White Box Monitoring (Internal)</h2>
+            <div class="text-sm text-gray-400 mb-4">Examines the internal state of the system.</div>
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold">CPU Utilization</span>
+                        <span class="text-yellow-400 font-bold">32%</span>
+                    </div>
+                    <div class="w-full bg-gray-600 rounded-full h-2.5 mt-1">
+                        <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 32%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold">Memory Usage</span>
+                        <span class="text-blue-400 font-bold">41%</span>
+                    </div>
+                    <div class="w-full bg-gray-600 rounded-full h-2.5 mt-1">
+                        <div class="bg-blue-500 h-2.5 rounded-full" style="width: 41%"></div>
+                    </div>
+                </div>
+                <div>
+                    <span class="font-semibold">DB Connections</span>
+                    <div class="text-2xl font-bold text-green-400">18/20</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

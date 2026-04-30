@@ -1,0 +1,30 @@
+<!-- Mobile overlay -->
+<div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+<aside class="sidebar" id="sidebar" role="navigation" aria-label="Course navigation">
+  {% for module in site.course_modules %}
+  <div class="sidebar-section">
+    <!-- Module header links to its overview page -->
+    <a href="{{ '/modules/' | append: module.slug | append: '/' | relative_url }}"
+       class="sidebar-module-header {% if page.module_id == module.id %}active{% endif %}"
+       style="border-left-color: {{ module.color }};">
+      <span class="sidebar-module-dot" style="background: {{ module.color }};"></span>
+      <span>{{ module.icon }} {{ module.title }}</span>
+    </a>
+
+    <ul class="sidebar-lessons">
+      {% for lesson in module.lessons %}
+      {% assign lesson_url = '/modules/' | append: module.slug | append: '/' | append: lesson.slug | append: '/' %}
+      <li>
+        <a href="{{ lesson_url | relative_url }}"
+           class="{% if page.lesson_id == lesson.id %}active{% endif %}"
+           style="{% if page.lesson_id == lesson.id %}border-left-color: {{ module.color }};{% endif %}">
+          {{ lesson.id | upcase }}. {{ lesson.title }}
+          <span class="lesson-status"></span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+</aside>

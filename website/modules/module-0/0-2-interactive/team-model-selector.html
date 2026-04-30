@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Team Model Selector</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        h1 {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: #005f73;
+            margin-bottom: 20px;
+        }
+        .form-section, .result-section {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        #result {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .rec-embedded { background-color: #94d2bd; }
+        .rec-centralized { background-color: #ee9b00; }
+        .rec-hybrid { background-color: #ae2012; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Interactive SRE Team Model Selector</h1>
+        <div class="form-section">
+            <h2>Organizational Assessment</h2>
+            <div class="form-group">
+                <label for="scale">Company Scale (Engineers)</label>
+                <select id="scale">
+                    <option value="embedded">10-50 (Startup)</option>
+                    <option value="centralized">50-500 (Growth)</option>
+                    <option value="hybrid">500+ (Enterprise)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="architecture">Technical Architecture</label>
+                <select id="architecture">
+                    <option value="centralized">Monolithic</option>
+                    <option value="embedded">Microservices</option>
+                    <option value="hybrid">Cloud-Native / Platform</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="culture">Engineering Culture</label>
+                <select id="culture">
+                    <option value="embedded">High Team Autonomy</option>
+                    <option value="centralized">Standardization Focus</option>
+                    <option value="hybrid">Platform-as-a-Product</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="business">Business Context</label>
+                <select id="business">
+                    <option value="embedded">Rapid Iteration</option>
+                    <option value="centralized">Enterprise Reliability</option>
+                    <option value="hybrid">Regulated Industries</option>
+                </select>
+            </div>
+        </div>
+        <div class="result-section">
+            <h2>Recommendation</h2>
+            <div id="result">
+                <p>Select your organizational characteristics to see the recommended SRE model.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const selectors = document.querySelectorAll('select');
+        const resultDiv = document.getElementById('result');
+
+        function calculateRecommendation() {
+            const scores = {
+                embedded: 0,
+                centralized: 0,
+                hybrid: 0
+            };
+
+            selectors.forEach(selector => {
+                scores[selector.value]++;
+            });
+
+            let maxScore = 0;
+            let recommendation = '';
+            for (const model in scores) {
+                if (scores[model] > maxScore) {
+                    maxScore = scores[model];
+                    recommendation = model;
+                }
+            }
+            
+            let resultHtml = '';
+            if (recommendation === 'embedded') {
+                resultHtml = `
+                    <div class="rec-embedded">
+                        <h2>Embedded SRE Model</h2>
+                        <p>Best for product intimacy and speed. Focus on deep service knowledge and fast response times.</p>
+                    </div>
+                `;
+            } else if (recommendation === 'centralized') {
+                resultHtml = `
+                    <div class="rec-centralized">
+                        <h2>Centralized SRE Model</h2>
+                        <p>Best for consistency and efficiency. Focus on standardized practices and shared tooling.</p>
+                    </div>
+                `;
+            } else {
+                resultHtml = `
+                    <div class="rec-hybrid">
+                        <h2>Hybrid SRE Model</h2>
+                        <p>Best for scale and expertise. Combines a central platform with embedded SREs.</p>
+                    </div>
+                `;
+            }
+            resultDiv.innerHTML = resultHtml;
+        }
+
+        selectors.forEach(selector => {
+            selector.addEventListener('change', calculateRecommendation);
+        });
+
+        calculateRecommendation();
+    </script>
+</body>
+</html>

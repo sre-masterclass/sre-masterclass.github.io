@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pipeline Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-8">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8">Data Pipeline Architecture</h1>
+        <div class="bg-gray-800 p-6 rounded-lg">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Collection Layer -->
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4 text-green-400">Collection Layer</h2>
+                    <ul class="list-disc list-inside text-sm space-y-2">
+                        <li><span class="font-bold">Metrics:</span> Prometheus with custom exporters</li>
+                        <li><span class="font-bold">Logs:</span> Fluentd/Loki with structured logging</li>
+                        <li><span class="font-bold">Traces:</span> Jaeger/Tempo with sampling</li>
+                    </ul>
+                </div>
+                <!-- Processing Layer -->
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4 text-yellow-400">Processing Layer</h2>
+                    <ul class="list-disc list-inside text-sm space-y-2">
+                        <li><span class="font-bold">Stream Processing:</span> Kafka Streams for real-time correlation</li>
+                        <li><span class="font-bold">Aggregation:</span> Recording rules for optimized queries</li>
+                        <li><span class="font-bold">Alerting:</span> AlertManager with intelligent grouping</li>
+                    </ul>
+                </div>
+                <!-- Storage & Query Layer -->
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4 text-red-400">Storage & Query Layer</h2>
+                    <ul class="list-disc list-inside text-sm space-y-2">
+                        <li><span class="font-bold">Time-Series Storage:</span> Prometheus with remote storage</li>
+                        <li><span class="font-bold">Log Storage:</span> Object storage with lifecycle management</li>
+                        <li><span class="font-bold">Query Performance:</span> Grafana with query caching</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

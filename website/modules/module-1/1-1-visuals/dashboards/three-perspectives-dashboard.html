@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Masterclass - Three Monitoring Perspectives</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #161719; color: #d8d9da; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #f0f0f0; font-weight: 300; letter-spacing: 0.5px; }
+        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
+        .panel { background-color: #1f2123; border: 1px solid #333; border-radius: 5px; padding: 20px; display: flex; flex-direction: column; }
+        .panel h2 { margin-top: 0; font-size: 1.3em; color: #56a64b; border-bottom: 1px solid #444; padding-bottom: 10px; font-weight: 500; }
+        .metric-group { margin-top: 15px; }
+        .metric-group h3 { margin: 0 0 10px 0; font-size: 1.1em; color: #f98538; font-weight: 400; }
+        .metric { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #2a2a2a; }
+        .metric-label { font-size: 0.95em; color: #bfbfbf; }
+        .metric-value { font-size: 1.1em; font-weight: bold; color: #73d216; }
+        .metric-value.neutral { color: #d8d9da; }
+        .metric-value.low-error { color: #73d216; }
+        .metric-value.high-error { color: #ef2929; }
+        .controls { text-align: center; margin-bottom: 20px; }
+        button { background-color: #f98538; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 1em; margin: 0 10px; }
+        footer { text-align: center; margin-top: 30px; font-size: 0.9em; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button onclick="setBaseline()">Normal Operation</button>
+        <button onclick="triggerLatencySpike()">Trigger 5-min Latency Spike</button>
+    </div>
+    <h1 id="dashboard-title">Three Monitoring Perspectives of the Same E-Commerce System (Baseline)</h1>
+    <div class="dashboard">
+        <div class="panel" id="use-panel">
+            <h2>USE Methodology (Resource-Focused)</h2>
+            <div class="metric-group">
+                <h3>Utilization</h3>
+                <div class="metric"><span class="metric-label">CPU</span><span id="use-cpu" class="metric-value neutral">~30%</span></div>
+                <div class="metric"><span class="metric-label">Memory</span><span id="use-memory" class="metric-value neutral">~40%</span></div>
+            </div>
+            <div class="metric-group">
+                <h3>Saturation</h3>
+                <div class="metric"><span class="metric-label">Connection Queuing</span><span id="use-queuing" class="metric-value neutral">None</span></div>
+            </div>
+            <div class="metric-group">
+                <h3>Errors</h3>
+                <div class="metric"><span class="metric-label">Resource Errors</span><span id="use-errors" class="metric-value low-error">0</span></div>
+            </div>
+        </div>
+        <div class="panel" id="red-panel">
+            <h2>RED Methodology (Request-Focused)</h2>
+            <div class="metric-group">
+                <h3>Rate</h3>
+                <div class="metric"><span class="metric-label">Requests/min</span><span id="red-rate" class="metric-value neutral">~150</span></div>
+            </div>
+            <div class="metric-group">
+                <h3>Errors</h3>
+                <div class="metric"><span class="metric-label">Error Rate</span><span id="red-errors" class="metric-value low-error"><0.1%</span></div>
+            </div>
+            <div class="metric-group">
+                <h3>Duration</h3>
+                <div class="metric"><span class="metric-label">95th Percentile</span><span id="red-duration" class="metric-value neutral">~100ms</span></div>
+            </div>
+        </div>
+        <div class="panel" id="golden-signals-panel">
+            <h2>Four Golden Signals (User-Focused)</h2>
+            <div class="metric-group">
+                <h3>Latency</h3>
+                <div class="metric"><span class="metric-label">End-to-End</span><span id="gs-latency" class="metric-value neutral">~120ms</span></div>
+            </div>
+            <div class="metric-group">
+                <h3>Traffic</h3>
+                <div class="metric"><span class="metric-label">User Sessions</span><span id="gs-traffic" class="metric-value neutral">Consistent</span></div>
+            </div>
+            <div class="metric-group">
+                <h3>Errors</h3>
+                <div class="metric"><span class="metric-label">User Journey Failures</span><span id="gs-errors" class="metric-value low-error">Near-zero</span></div>
+            </div>
+            <div class="metric-group">
+                <h3>Saturation</h3>
+                <div class="metric"><span class="metric-label">Application Saturation</span><span id="gs-saturation" class="metric-value neutral">Well below</span></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function setBaseline() {
+            document.getElementById('dashboard-title').innerText = 'Three Monitoring Perspectives of the Same E-Commerce System (Baseline)';
+            
+            // USE Panel
+            document.getElementById('use-cpu').innerText = '~30%';
+            document.getElementById('use-memory').innerText = '~40%';
+            document.getElementById('use-queuing').innerText = 'None';
+            document.getElementById('use-errors').innerText = '0';
+            document.getElementById('use-errors').className = 'metric-value low-error';
+
+            // RED Panel
+            document.getElementById('red-rate').innerText = '~150';
+            document.getElementById('red-errors').innerText = '<0.1%';
+            document.getElementById('red-errors').className = 'metric-value low-error';
+            document.getElementById('red-duration').innerText = '~100ms';
+
+            // Golden Signals Panel
+            document.getElementById('gs-latency').innerText = '~120ms';
+            document.getElementById('gs-traffic').innerText = 'Consistent';
+            document.getElementById('gs-errors').innerText = 'Near-zero';
+            document.getElementById('gs-errors').className = 'metric-value low-error';
+            document.getElementById('gs-saturation').innerText = 'Well below';
+        }
+
+        function triggerLatencySpike() {
+            document.getElementById('dashboard-title').innerText = 'Three Monitoring Perspectives of the Same E-Commerce System (Latency Spike)';
+
+            // USE Panel
+            document.getElementById('use-cpu').innerText = '~30%';
+            document.getElementById('use-memory').innerText = 'Stable';
+            document.getElementById('use-queuing').innerText = 'Slight Increase';
+            document.getElementById('use-errors').innerText = '0';
+            document.getElementById('use-errors').className = 'metric-value low-error';
+
+            // RED Panel
+            document.getElementById('red-rate').innerText = 'Drops slightly';
+            document.getElementById('red-errors').innerText = '~15%';
+            document.getElementById('red-errors').className = 'metric-value high-error';
+            document.getElementById('red-duration').innerText = '~600ms';
+
+            // Golden Signals Panel
+            document.getElementById('gs-latency').innerText = '~650ms';
+            document.getElementById('gs-traffic').innerText = 'Abandonment Increases';
+            document.getElementById('gs-errors').innerText = 'Significant Increase';
+            document.getElementById('gs-errors').className = 'metric-value high-error';
+            document.getElementById('gs-saturation').innerText = 'Detected';
+        }
+    </script>
+    <footer>
+        <p>Metrics shown are based on a technically validated simulation. See technical-validation.md for details.</p>
+    </footer>
+</body>
+</html>
