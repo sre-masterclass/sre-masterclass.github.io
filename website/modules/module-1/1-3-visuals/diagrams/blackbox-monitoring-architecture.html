@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Black Box Monitoring Architecture</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0f172a;
+    color: #f1f5f9;
+    padding: 20px 24px;
+    font-size: 13px;
+  }
+  h2 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+  .arch {
+    display: grid;
+    grid-template-columns: 1fr 100px 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+  /* Left: probe locations */
+  .probes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .probe {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .probe-name {
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #38bdf8;
+    margin-bottom: 4px;
+  }
+  .probe-type {
+    font-size: 0.72rem;
+    color: #94a3b8;
+  }
+  .probe-check {
+    font-size: 0.72rem;
+    color: #86efac;
+    margin-top: 4px;
+  }
+  /* Center: arrows */
+  .arrows {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-top: 60px;
+    color: #475569;
+    font-size: 0.7rem;
+    text-align: center;
+  }
+  .arrow-line {
+    width: 2px;
+    height: 24px;
+    background: #334155;
+    margin: 0 auto;
+  }
+  .arrow-label {
+    font-size: 0.68rem;
+    color: #64748b;
+    white-space: nowrap;
+  }
+  /* Right: service + what's missed */
+  .service-side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .service-box {
+    background: #1e3a5f;
+    border: 2px solid #0ea5e9;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .service-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #38bdf8;
+    margin-bottom: 4px;
+  }
+  .service-note { font-size: 0.72rem; color: #93c5fd; }
+  .misses-box {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .misses-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #f87171;
+    margin-bottom: 6px;
+  }
+  .miss-item {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    padding: 2px 0;
+    border-bottom: 1px solid #1e293b;
+  }
+  .miss-item:last-child { border-bottom: none; }
+  .miss-icon { color: #fbbf24; margin-right: 4px; }
+  .advantages {
+    background: #14532d;
+    border: 1px solid #16a34a;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .adv-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #86efac;
+    margin-bottom: 6px;
+  }
+  .adv-item {
+    font-size: 0.72rem;
+    color: #dcfce7;
+    padding: 2px 0;
+  }
+  .adv-icon { margin-right: 4px; }
+  .probe-arrow {
+    display: flex;
+    align-items: center;
+    color: #0ea5e9;
+    font-size: 1.1rem;
+    justify-content: center;
+    flex-direction: column;
+  }
+</style>
+</head>
+<body>
+<h2>Black Box Monitoring Architecture</h2>
+
+<div class="arch">
+  <!-- LEFT: Probe Locations -->
+  <div class="probes">
+    <div style="font-size:0.72rem;color:#64748b;text-align:center;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em;">Probe Locations (External)</div>
+
+    <div class="probe">
+      <div class="probe-name">🇺🇸 US-East (AWS)</div>
+      <div class="probe-type">Blackbox Exporter + Prometheus</div>
+      <div class="probe-check">✓ HTTP/TLS probe every 30s</div>
+      <div class="probe-check">✓ DNS resolution check</div>
+    </div>
+
+    <div class="probe">
+      <div class="probe-name">🇪🇺 EU-West (GCP)</div>
+      <div class="probe-type">Datadog Synthetics</div>
+      <div class="probe-check">✓ End-to-end transaction</div>
+      <div class="probe-check">✓ Certificate expiry check</div>
+    </div>
+
+    <div class="probe">
+      <div class="probe-name">🌏 APAC (Azure)</div>
+      <div class="probe-type">Pingdom / CloudWatch</div>
+      <div class="probe-check">✓ HTTP availability probe</div>
+      <div class="probe-check">✓ Regional routing check</div>
+    </div>
+
+    <div class="advantages">
+      <div class="adv-title">✅ What Black Box Catches</div>
+      <div class="adv-item"><span class="adv-icon">🔍</span>DNS resolution failures</div>
+      <div class="adv-item"><span class="adv-icon">🔒</span>Certificate expiration</div>
+      <div class="adv-item"><span class="adv-icon">🌐</span>CDN / routing failures</div>
+      <div class="adv-item"><span class="adv-icon">📍</span>Geographic isolation</div>
+    </div>
+  </div>
+
+  <!-- CENTER: Arrow column -->
+  <div class="arrows">
+    <div class="arrow-label">Synthetic<br>probes</div>
+    <div style="font-size:1.6rem;color:#0ea5e9;">→→→</div>
+    <div style="font-size:1.6rem;color:#0ea5e9;">→→→</div>
+    <div style="font-size:1.6rem;color:#0ea5e9;">→→→</div>
+    <div class="arrow-label">simulate<br>real users</div>
+  </div>
+
+  <!-- RIGHT: Service + what's invisible to white box -->
+  <div class="service-side">
+    <div style="font-size:0.72rem;color:#64748b;text-align:center;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em;">Your Production Service</div>
+
+    <div class="service-box">
+      <div class="service-name">🛒 Checkout API</div>
+      <div class="service-note">Internal metrics, logs &amp; traces</div>
+      <div class="service-note" style="color:#60a5fa;margin-top:6px;">All white-box signals<br>are healthy ✓</div>
+    </div>
+
+    <div class="misses-box">
+      <div class="misses-title">⚠️ What White Box Misses</div>
+      <div class="miss-item"><span class="miss-icon">🚫</span>Requests that never arrive (DNS fail)</div>
+      <div class="miss-item"><span class="miss-icon">🚫</span>TLS handshake failures at edge</div>
+      <div class="miss-item"><span class="miss-icon">🚫</span>Load balancer misrouting</div>
+      <div class="miss-item"><span class="miss-icon">🚫</span>Network partition (specific region)</div>
+    </div>
+
+    <div style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px 12px;">
+      <div style="font-size:0.75rem;font-weight:700;color:#fbbf24;margin-bottom:5px;">📋 Synthetic Probe SLI</div>
+      <div style="font-size:0.72rem;color:#94a3b8;line-height:1.7;">
+        <div><strong style="color:#e2e8f0;">Good events:</strong> probe_success == 1</div>
+        <div><strong style="color:#e2e8f0;">Total events:</strong> all probe executions</div>
+        <div><strong style="color:#e2e8f0;">Window:</strong> 30 days rolling</div>
+        <div style="color:#86efac;margin-top:4px;font-weight:600;">→ SLO target: 99.9% availability</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

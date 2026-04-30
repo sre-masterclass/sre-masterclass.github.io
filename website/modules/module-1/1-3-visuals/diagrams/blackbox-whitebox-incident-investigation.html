@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Black Box vs White Box — Incident Investigation Flow</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0f172a;
+    color: #f1f5f9;
+    padding: 18px 22px;
+    font-size: 13px;
+  }
+  h2 {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .step {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 0;
+  }
+  .step-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40px;
+    flex-shrink: 0;
+  }
+  .step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+  .step-line {
+    width: 2px;
+    flex: 1;
+    min-height: 16px;
+    margin: 2px auto;
+  }
+  .step-content {
+    background: #1e293b;
+    border-radius: 8px;
+    padding: 10px 14px;
+    flex: 1;
+    margin-bottom: 4px;
+    border-left: 3px solid transparent;
+  }
+  .step-layer {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+  .step-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .step-detail {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    line-height: 1.6;
+  }
+  .finding {
+    display: inline-block;
+    background: #0f172a;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.72rem;
+    font-family: monospace;
+    margin-top: 5px;
+    color: #e2e8f0;
+  }
+  /* Color scheme per step */
+  .s1 .step-number { background: #7c3aed; color: #fff; }
+  .s1 .step-line   { background: #7c3aed; }
+  .s1 .step-content { border-left-color: #7c3aed; }
+  .s1 .step-layer { color: #c4b5fd; }
+  .s1 .step-title { color: #e9d5ff; }
+
+  .s2 .step-number { background: #0ea5e9; color: #fff; }
+  .s2 .step-line   { background: #0ea5e9; }
+  .s2 .step-content { border-left-color: #0ea5e9; }
+  .s2 .step-layer { color: #7dd3fc; }
+  .s2 .step-title { color: #bae6fd; }
+
+  .s3 .step-number { background: #0369a1; color: #fff; }
+  .s3 .step-line   { background: #0369a1; }
+  .s3 .step-content { border-left-color: #0369a1; }
+  .s3 .step-layer { color: #60a5fa; }
+  .s3 .step-title { color: #93c5fd; }
+
+  .s4 .step-number { background: #16a34a; color: #fff; }
+  .s4 .step-line   { background: transparent; }
+  .s4 .step-content { border-left-color: #16a34a; }
+  .s4 .step-layer { color: #86efac; }
+  .s4 .step-title { color: #bbf7d0; }
+
+  .alert-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #450a0a;
+    border: 1px solid #dc2626;
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fca5a5;
+    margin-bottom: 5px;
+  }
+</style>
+</head>
+<body>
+<h2>Incident Investigation: Black Box → White Box Drill-Down</h2>
+
+<div class="flow">
+
+  <!-- Step 1: Black Box fires -->
+  <div class="step s1">
+    <div class="step-left">
+      <div class="step-number">1</div>
+      <div class="step-line"></div>
+    </div>
+    <div class="step-content">
+      <div class="step-layer">🔭 Black Box Layer — Synthetic Probe</div>
+      <div class="step-title">Alert fires: User-visible failure detected</div>
+      <div class="alert-badge">🚨 ALERT: checkout_synthetic_availability &lt; 99.9%</div>
+      <div class="step-detail">
+        US-East probe reports checkout endpoint returning 503s.<br>
+        EU-West probe is healthy — regional failure likely.
+      </div>
+      <div class="finding">probe_success{region="us-east"} = 0  |  EU-West = 1</div>
+    </div>
+  </div>
+
+  <!-- Step 2: RED metrics -->
+  <div class="step s2">
+    <div class="step-left">
+      <div class="step-number">2</div>
+      <div class="step-line"></div>
+    </div>
+    <div class="step-content">
+      <div class="step-layer">📊 White Box — RED Metrics (Service Layer)</div>
+      <div class="step-title">Identify the degraded service</div>
+      <div class="step-detail">
+        Check RED signals for all services in the checkout path:<br>
+        <strong style="color:#fbbf24;">Product API: error rate 15%, P99 latency 8s ← culprit</strong><br>
+        Auth API: healthy. Frontend: elevated latency (cascading).
+      </div>
+      <div class="finding">rate(http_requests_total{service="product-api",status="5xx"}[5m]) = 0.15</div>
+    </div>
+  </div>
+
+  <!-- Step 3: USE metrics -->
+  <div class="step s3">
+    <div class="step-left">
+      <div class="step-number">3</div>
+      <div class="step-line"></div>
+    </div>
+    <div class="step-content">
+      <div class="step-layer">⚙️ White Box — USE Metrics (Infrastructure Layer)</div>
+      <div class="step-title">Identify the resource constraint</div>
+      <div class="step-detail">
+        Check USE signals for Product API's infrastructure:<br>
+        <strong style="color:#fbbf24;">Redis connection pool: 98% utilization (saturation) ← constraint</strong><br>
+        CPU: 45% (normal). Memory: 60% (normal). Disk: healthy.
+      </div>
+      <div class="finding">hikaricp_connections_active / hikaricp_connections_max = 0.98</div>
+    </div>
+  </div>
+
+  <!-- Step 4: Root Cause -->
+  <div class="step s4">
+    <div class="step-left">
+      <div class="step-number">4</div>
+      <div class="step-line"></div>
+    </div>
+    <div class="step-content">
+      <div class="step-layer">✅ Root Cause Identified</div>
+      <div class="step-title">Redis connection pool exhausted → cascading failure</div>
+      <div class="step-detail">
+        Redis connection pool exhausted → synchronous cache misses → all requests hit database → DB query queue builds → API timeouts → user-visible 503s in US-East only (EU-West has separate Redis cluster).
+      </div>
+      <div class="finding">Resolution: increase connection pool max-size + add circuit breaker</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

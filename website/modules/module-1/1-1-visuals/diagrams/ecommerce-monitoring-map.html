@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>E-commerce Architecture Monitoring Map</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0f172a;
+    color: #f1f5f9;
+    padding: 20px 24px;
+    font-size: 13px;
+  }
+  h2 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .component {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 12px;
+    position: relative;
+  }
+  .component-name {
+    font-weight: 700;
+    font-size: 0.82rem;
+    margin-bottom: 6px;
+    color: #e2e8f0;
+  }
+  .taxonomy-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .tag {
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .use { background: #1e3a5f; color: #60a5fa; border: 1px solid #2563eb; }
+  .red { background: #0c3146; color: #38bdf8; border: 1px solid #0ea5e9; }
+  .four { background: #2e1065; color: #c4b5fd; border: 1px solid #7c3aed; }
+  .key-metrics {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    line-height: 1.6;
+  }
+  .key-metrics span {
+    display: block;
+  }
+  .arrow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    font-size: 1.2rem;
+    margin: 4px 0;
+  }
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    border-top: 1px solid #1e293b;
+    padding-top: 12px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    color: #94a3b8;
+  }
+  .leg-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+  }
+  .flow-label {
+    text-align: center;
+    font-size: 0.7rem;
+    color: #475569;
+    margin: 2px 0 6px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<h2>E-commerce Architecture Monitoring Map</h2>
+
+<div class="flow-label">User requests flow top → bottom</div>
+
+<div class="arch-grid">
+  <!-- Row 1 -->
+  <div class="component">
+    <div class="component-name">🌐 CDN / Edge</div>
+    <div class="taxonomy-tags">
+      <span class="tag red">RED</span>
+    </div>
+    <div class="key-metrics">
+      <span>• Request rate, cache hit rate</span>
+      <span>• Origin error rate</span>
+      <span>• Cache miss rate</span>
+    </div>
+  </div>
+  <div class="component">
+    <div class="component-name">⚖️ Load Balancer</div>
+    <div class="taxonomy-tags">
+      <span class="tag use">USE</span>
+      <span class="tag red">RED</span>
+    </div>
+    <div class="key-metrics">
+      <span>• Connection utilization</span>
+      <span>• Request rate, 5xx rate</span>
+      <span>• Active backends</span>
+    </div>
+  </div>
+  <div class="component">
+    <div class="component-name">👤 User Browser</div>
+    <div class="taxonomy-tags">
+      <span class="tag four">4GS</span>
+    </div>
+    <div class="key-metrics">
+      <span>• Page load latency (RUM)</span>
+      <span>• JavaScript error rate</span>
+      <span>• Core Web Vitals</span>
+    </div>
+  </div>
+
+  <!-- Row 2 -->
+  <div class="component">
+    <div class="component-name">🛒 Frontend Service</div>
+    <div class="taxonomy-tags">
+      <span class="tag red">RED</span>
+      <span class="tag four">4GS</span>
+    </div>
+    <div class="key-metrics">
+      <span>• Request rate &amp; error rate</span>
+      <span>• P95 / P99 latency</span>
+      <span>• Saturation (active conn.)</span>
+    </div>
+  </div>
+  <div class="component">
+    <div class="component-name">🔐 Auth API</div>
+    <div class="taxonomy-tags">
+      <span class="tag red">RED</span>
+    </div>
+    <div class="key-metrics">
+      <span>• Login success/failure rate</span>
+      <span>• Token validation latency</span>
+      <span>• Auth error breakdown</span>
+    </div>
+  </div>
+  <div class="component">
+    <div class="component-name">📦 Product API</div>
+    <div class="taxonomy-tags">
+      <span class="tag red">RED</span>
+    </div>
+    <div class="key-metrics">
+      <span>• RPS, P99 latency</span>
+      <span>• Error rate by status code</span>
+      <span>• Search query duration</span>
+    </div>
+  </div>
+
+  <!-- Row 3 -->
+  <div class="component">
+    <div class="component-name">🗄️ PostgreSQL DB</div>
+    <div class="taxonomy-tags">
+      <span class="tag use">USE</span>
+      <span class="tag red">RED</span>
+    </div>
+    <div class="key-metrics">
+      <span>• Connection pool saturation</span>
+      <span>• Query rate &amp; latency</span>
+      <span>• Lock waits, slow queries</span>
+    </div>
+  </div>
+  <div class="component">
+    <div class="component-name">⚡ Redis Cache</div>
+    <div class="taxonomy-tags">
+      <span class="tag use">USE</span>
+      <span class="tag red">RED</span>
+    </div>
+    <div class="key-metrics">
+      <span>• Memory utilization</span>
+      <span>• Hit rate, eviction rate</span>
+      <span>• Command latency</span>
+    </div>
+  </div>
+  <div class="component">
+    <div class="component-name">⚙️ Worker Nodes (K8s)</div>
+    <div class="taxonomy-tags">
+      <span class="tag use">USE</span>
+    </div>
+    <div class="key-metrics">
+      <span>• CPU &amp; memory utilization</span>
+      <span>• Disk I/O saturation</span>
+      <span>• Network errors</span>
+    </div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="leg-dot" style="background:#2563eb;"></div> USE — Fixed capacity resources</div>
+  <div class="legend-item"><div class="leg-dot" style="background:#0ea5e9;"></div> RED — Request-driven services</div>
+  <div class="legend-item"><div class="leg-dot" style="background:#7c3aed;"></div> 4GS — User-facing systems</div>
+</div>
+</body>
+</html>
