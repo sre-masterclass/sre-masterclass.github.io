@@ -12,7 +12,7 @@ structlog = "^24.4.0"
 prometheus-client = "^0.21.0"
 passlib = "^1.7.4"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
-python-multipart = "^0.0.18"
+python-multipart = ">=0.0.18,<0.0.27"
 prometheus-fastapi-instrumentator = "^7.1.0"
 
 [tool.poetry.group.dev.dependencies]
