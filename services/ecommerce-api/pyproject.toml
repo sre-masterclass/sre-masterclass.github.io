@@ -6,7 +6,7 @@ authors = ["Your Name <sre.masterclass@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.115.0"
+fastapi = ">=0.115,<0.137"
 uvicorn = "^0.32.0"
 structlog = "^24.4.0"
 prometheus-client = "^0.22.1"
