@@ -46,14 +46,17 @@ SAFE is a pattern for anomaly detection that accounts for the seasonal nature of
 
 Instead of asking "is this value above threshold X?", SAFE asks: "Is this value significantly different from what it looked like at this same time in previous cycles?"
 
+{% raw %}
 ```
 Baseline = median(same_hour, same_day_of_week, last_N_weeks)
 Deviation = abs(current_value - baseline) / baseline
 Alert if: deviation > threshold (e.g., 50% deviation from baseline)
 ```
+{% endraw %}
 
 ### Implementing SAFE in Prometheus
 
+{% raw %}
 ```prometheus
 # 1. Calculate the baseline using recording rules
 # Baseline = median of the same 5-minute window across the last 4 weeks
@@ -76,6 +79,7 @@ labels:
 annotations:
   summary: "Abnormal request rate: {{ $value | humanizePercentage }} deviation from baseline"
 ```
+{% endraw %}
 
 ### SAFE Limitations
 
@@ -85,6 +89,7 @@ SAFE works well for traffic patterns that are stable and predictable over weeks.
 - After significant organic traffic growth (the baseline becomes stale)
 
 For these cases, combine SAFE with **rate-of-change alerts**:
+{% raw %}
 ```prometheus
 # Alert if the rate changes rapidly, regardless of absolute value
 alert: RapidRateIncrease
@@ -93,6 +98,7 @@ expr: >
   > 2 * rate(http_requests_total[5m] offset 1h)
 for: 3m
 ```
+{% endraw %}
 
 {% include tool-embed.html
    title="Anomaly Detection Playground"
@@ -109,6 +115,7 @@ A more sophisticated approach to baselines uses quantile analysis across a rolli
 
 ### The Quantile Approach
 
+{% raw %}
 ```prometheus
 # Define the "normal" band as P5 to P95 of the past 7 days
 record: job:latency_p5_7d:quantile
@@ -125,6 +132,7 @@ expr: >
   (http_request_duration_seconds < job:latency_p5_7d:quantile * 0.5)
 for: 5m
 ```
+{% endraw %}
 
 This approach is more robust than SAFE for metrics that don't have strong weekly seasonality, and it automatically adapts as the system's performance profile changes over time.
 
@@ -138,6 +146,7 @@ One of the most valuable patterns in production monitoring is automatically corr
 
 In Grafana, you can create annotation queries that overlay deployment events on time series graphs:
 
+{% raw %}
 ```sql
 -- PostgreSQL/InfluxDB annotation query for Grafana
 SELECT 
@@ -148,6 +157,7 @@ FROM deployments
 WHERE deploy_time BETWEEN $__timeFrom() AND $__timeTo()
 ORDER BY deploy_time
 ```
+{% endraw %}
 
 When a latency spike appears on a graph, the deployment annotation immediately shows whether a deployment preceded it — dramatically reducing investigation time.
 
@@ -155,6 +165,7 @@ When a latency spike appears on a graph, the deployment annotation immediately s
 
 For higher-fidelity correlation, implement automated deployment impact detection:
 
+{% raw %}
 ```python
 # Simplified deployment impact detector
 def check_deployment_impact(service, deployment_time, metrics_client):
@@ -187,6 +198,7 @@ def check_deployment_impact(service, deployment_time, metrics_client):
             recommendation="Consider rollback"
         )
 ```
+{% endraw %}
 
 {% include diagram-embed.html
    title="Deployment Impact Detection Timeline"
@@ -213,6 +225,7 @@ Most alerts are **lagging indicators** — they fire after a problem has already
 
 ### Implementing Leading Indicator Alerts
 
+{% raw %}
 ```prometheus
 # Leading indicator: cache hit rate declining
 # Alert before the database load becomes problematic
@@ -241,6 +254,7 @@ labels:
 annotations:
   summary: "Memory will be exhausted in approximately 3 hours at current growth rate"
 ```
+{% endraw %}
 
 The `predict_linear()` function is particularly powerful — it projects the current trend forward and alerts if the projected value would breach a threshold within a time window.
 
@@ -261,6 +275,7 @@ The presence of all three together points to **resource exhaustion** as the root
 
 ### Correlation Alerts
 
+{% raw %}
 ```prometheus
 # Composite alert: error rate spike + latency spike simultaneously
 # This pattern strongly suggests an incident, not just a transient blip
@@ -282,6 +297,7 @@ labels:
 annotations:
   summary: "Service degradation pattern: high errors AND high latency simultaneously"
 ```
+{% endraw %}
 
 {% include tool-embed.html
    title="Multi-Window Aggregation Visualizer"

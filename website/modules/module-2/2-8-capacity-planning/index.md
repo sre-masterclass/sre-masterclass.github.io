@@ -45,6 +45,7 @@ Your capacity plan must account for three sources of traffic variance:
 3. **Incident headroom**: Capacity to absorb sudden traffic surges that would otherwise trigger SLO breaches
 
 **Capacity formula**:
+{% raw %}
 ```
 Required Capacity = 
   peak_traffic × (1 + growth_rate × planning_horizon)
@@ -63,6 +64,7 @@ Example:
   
   Required capacity = 10,000 × 1.587 × 4 × 3.33 = 211,487 RPS capacity
 ```
+{% endraw %}
 
 ### Why 70% Utilization Ceiling?
 
@@ -73,6 +75,7 @@ Setting a capacity ceiling at 70% (not 90%) provides:
 
 For services with latency SLOs, the utilization ceiling may need to be lower. Queueing theory (M/M/1 queue model) shows that latency increases nonlinearly as utilization approaches 100%:
 
+{% raw %}
 ```
 Average response time = service_time / (1 - utilization)
 
@@ -81,6 +84,7 @@ At 70% utilization: latency = 3.33× service time
 At 90% utilization: latency = 10× service time
 At 95% utilization: latency = 20× service time
 ```
+{% endraw %}
 
 **Implication**: A service with a P99 latency SLO of 200ms that takes 100ms at idle will breach its SLO before reaching 50% CPU utilization if requests are queuing. The SLO-informed utilization ceiling may be well below 70%.
 
@@ -92,6 +96,7 @@ At 95% utilization: latency = 20× service time
 
 The simplest model — assumes consistent percentage growth:
 
+{% raw %}
 ```python
 import numpy as np
 from scipy import stats
@@ -126,11 +131,13 @@ def forecast_traffic(historical_rps, days_to_forecast):
         'monthly_growth_rate': np.exp(slope * 30) - 1
     }
 ```
+{% endraw %}
 
 ### Seasonality-Aware Forecasting
 
 For services with strong seasonal patterns, linear trends alone are insufficient. Use decomposition:
 
+{% raw %}
 ```python
 from statsmodels.tsa.seasonal import seasonal_decompose
 
@@ -145,6 +152,7 @@ decomposition = seasonal_decompose(
 seasonal_peak_factor = decomposition.seasonal.max()
 # Plan for trend_forecast × seasonal_peak_factor
 ```
+{% endraw %}
 
 ### Event-Based Capacity Planning
 
@@ -154,6 +162,7 @@ Some traffic spikes are predictable from business events, not seasonal patterns:
 - Regulatory deadlines → end-of-period spikes
 
 Maintain a capacity events calendar:
+{% raw %}
 ```yaml
 # capacity-events-2026.yml
 events:
@@ -169,6 +178,7 @@ events:
     preparation_lead_time: 14 days
     capacity_type: [payment_processing, checkout]
 ```
+{% endraw %}
 
 ---
 
@@ -178,6 +188,7 @@ Every SLO target has a cost. Tighter SLOs require more capacity headroom, more r
 
 ### The Capacity Cost of SLO Targets
 
+{% raw %}
 ```
 For each availability target, calculate:
   Expected downtime per year = (1 - SLO) × 8760 hours
@@ -187,6 +198,7 @@ For each availability target, calculate:
 Break-even: SLO is worth achieving if:
   infrastructure_cost < expected_downtime_savings
 ```
+{% endraw %}
 
 **Example analysis**:
 
@@ -203,6 +215,7 @@ For most businesses, the jump from 99.0% to 99.9% has the best ROI. The jump fro
 
 When a capacity-related incident depletes your error budget, quantify the cost:
 
+{% raw %}
 ```
 Budget Cost = incident_duration_minutes / monthly_budget_minutes
 
@@ -214,6 +227,7 @@ Example: 4-hour capacity incident on a 99.9% SLO service
   → 5.6 months of reliability budget consumed in 4 hours
   → If not addressed: feature freeze for next 5+ months
 ```
+{% endraw %}
 
 This calculation makes the business case for proactive capacity investment concrete.
 
@@ -245,6 +259,7 @@ This calculation makes the business case for proactive capacity investment concr
 
 Don't wait for the quarterly review to catch capacity trends:
 
+{% raw %}
 ```prometheus
 # Alert: service will exceed 70% CPU within 30 days at current growth rate
 alert: CapacityGrowthRisk
@@ -271,6 +286,7 @@ for: 15m
 annotations:
   summary: "Latency increase correlated with high CPU — capacity pressure emerging"
 ```
+{% endraw %}
 
 ---
 

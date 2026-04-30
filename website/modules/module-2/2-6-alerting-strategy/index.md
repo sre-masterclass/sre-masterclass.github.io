@@ -50,6 +50,7 @@ Before writing any alert, evaluate it against these three properties:
 ### Evaluating Your Existing Alerts
 
 Run this audit quarterly:
+{% raw %}
 ```
 For each alert in the past 90 days:
   - How many times did it fire?
@@ -60,6 +61,7 @@ If false positive rate > 20%: retune or delete
 If never led to action: delete
 If fires daily with no action: retune threshold or delete
 ```
+{% endraw %}
 
 ---
 
@@ -69,6 +71,7 @@ The burn rate alert hierarchy from Lesson 2.4, implemented completely:
 
 ### Recording Rules (Run These First)
 
+{% raw %}
 ```prometheus
 # All recording rules for a checkout service with 99.9% SLO
 # These pre-compute burn rates at multiple windows
@@ -121,9 +124,11 @@ groups:
       - record: slo:checkout:burn_rate:6h
         expr: (1 - slo:checkout:availability:6h) / 0.001
 ```
+{% endraw %}
 
 ### Alerting Rules
 
+{% raw %}
 ```yaml
 groups:
   - name: slo:checkout:alerts
@@ -176,11 +181,13 @@ groups:
         annotations:
           summary: "Checkout error budget {{ $value | humanizePercentage }} remaining this month"
 ```
+{% endraw %}
 
 ---
 
 ## Alert Routing Architecture
 
+{% raw %}
 ```yaml
 # AlertManager routing for SLO-based alerts
 route:
@@ -213,6 +220,7 @@ route:
       group_interval: 1h
       repeat_interval: 24h
 ```
+{% endraw %}
 
 ### Escalation Policy
 
@@ -235,6 +243,7 @@ The most common alert noise sources and how to eliminate them:
 
 **Fix**: Increase the `for:` duration. If an alert requires 5 consecutive minutes at the threshold before firing, single-minute spikes won't trigger it.
 
+{% raw %}
 ```yaml
 # Before: fires every time metric crosses threshold
 alert: HighErrorRate
@@ -246,6 +255,7 @@ alert: HighErrorRate
 expr: error_rate > 0.01
 for: 5m  # Must be above threshold for 5 consecutive minutes
 ```
+{% endraw %}
 
 ### Missing Data Alerts
 
@@ -253,6 +263,7 @@ for: 5m  # Must be above threshold for 5 consecutive minutes
 
 **Fix**: Use `absent()` to detect missing metrics explicitly, and add `or` clauses to handle missing data gracefully:
 
+{% raw %}
 ```yaml
 # Fires when metric is missing OR when condition is met
 expr: >
@@ -260,6 +271,7 @@ expr: >
   OR
   (rate(http_requests_total{status_code=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.01)
 ```
+{% endraw %}
 
 ### Cause-and-Effect Alert Storms
 
@@ -267,6 +279,7 @@ expr: >
 
 **Fix**: Use AlertManager's inhibition rules to suppress downstream alerts when a root cause alert is already firing:
 
+{% raw %}
 ```yaml
 # inhibit_rules: if a node-down alert is firing,
 # suppress all per-service alerts on that node
@@ -277,6 +290,7 @@ inhibit_rules:
       - alertname=~"Service.*"
     equal: ['node']
 ```
+{% endraw %}
 
 ---
 

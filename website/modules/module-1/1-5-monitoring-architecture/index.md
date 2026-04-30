@@ -38,6 +38,7 @@ The solution is to treat monitoring infrastructure the same way you treat produc
 
 A complete monitoring architecture has five layers:
 
+{% raw %}
 ```
 ┌─────────────────────────────────────────────────┐
 │  5. Alerting & Response                         │
@@ -56,6 +57,7 @@ A complete monitoring architecture has five layers:
 │     Application metrics, exporters, agents      │
 └─────────────────────────────────────────────────┘
 ```
+{% endraw %}
 
 Each layer has distinct design decisions. Changing the storage layer (e.g., migrating from single Prometheus to Thanos) shouldn't require changes to instrumentation. Decisions at each layer should be loosely coupled from decisions at adjacent layers.
 
@@ -65,11 +67,13 @@ Each layer has distinct design decisions. Changing the storage layer (e.g., migr
 
 The starting point for most organizations. One Prometheus instance collects all metrics across all services.
 
+{% raw %}
 ```
 Services → Prometheus → Grafana
               ↓
           AlertManager → PagerDuty
 ```
+{% endraw %}
 
 **When it works**: 
 - < 500,000 active time series
@@ -93,15 +97,18 @@ Services → Prometheus → Grafana
 
 Multiple Prometheus instances at the "leaf" level (one per service cluster or region), with a "root" Prometheus that federates aggregated data from all leaves.
 
+{% raw %}
 ```
 Cluster A → Prometheus-A ─────────┐
 Cluster B → Prometheus-B ─────────┤→ Federation Prometheus → Grafana
 Cluster C → Prometheus-C ─────────┘              ↓
                                           AlertManager
 ```
+{% endraw %}
 
 **Key design consideration**: Leaf Prometheus instances handle raw scraping and local alerting. The federation layer handles cross-cluster aggregation and global dashboards. **Don't send high-cardinality raw data through the federation layer** — only pre-aggregated recording rules.
 
+{% raw %}
 ```yaml
 # Federation scrape config — only pull aggregated recording rules
 # from leaf instances
@@ -119,6 +126,7 @@ scrape_configs:
           - 'prometheus-b:9090'
           - 'prometheus-c:9090'
 ```
+{% endraw %}
 
 ---
 
@@ -133,6 +141,7 @@ For organizations requiring multi-year retention, high availability, and global 
 - **Compactor**: Downsamples old data to reduce storage costs
 - **Ruler**: Evaluates recording rules and alerts globally
 
+{% raw %}
 ```
 Region A: Prometheus + Thanos Sidecar ─── Object Storage (S3)
 Region B: Prometheus + Thanos Sidecar ────────────────────────┘
@@ -141,6 +150,7 @@ Region B: Prometheus + Thanos Sidecar ──────────────
                                     ↓
                             Thanos Querier → Grafana
 ```
+{% endraw %}
 
 **When to invest in Thanos**:
 - Multi-region deployments where a single Prometheus can't cover all targets
@@ -161,6 +171,7 @@ Region B: Prometheus + Thanos Sidecar ──────────────
 
 All Prometheus alerting and recording rules should be stored in version control, reviewed via pull request, and deployed through CI/CD:
 
+{% raw %}
 ```yaml
 # File: monitoring/rules/api-service.yml
 # Reviewed and merged like any application code
@@ -188,11 +199,13 @@ groups:
           summary: "API service error rate {{ $value | humanizePercentage }}"
           runbook: "https://runbooks.example.com/api-high-error-rate"
 ```
+{% endraw %}
 
 ### Prometheus Operator (Kubernetes)
 
 In Kubernetes environments, the Prometheus Operator allows teams to define monitoring configuration as Kubernetes custom resources — enabling product teams to own their monitoring without giving them access to the global Prometheus config:
 
+{% raw %}
 ```yaml
 # ServiceMonitor — lets the API team define their own scrape config
 apiVersion: monitoring.coreos.com/v1
@@ -211,7 +224,9 @@ spec:
       interval: 15s
       path: /metrics
 ```
+{% endraw %}
 
+{% raw %}
 ```yaml
 # PrometheusRule — teams own their own alert definitions
 apiVersion: monitoring.coreos.com/v1
@@ -229,11 +244,13 @@ spec:
           labels:
             severity: warning
 ```
+{% endraw %}
 
 ### Grafana as Code
 
 Grafana dashboards are JSON — they should be stored in version control and deployed through CI/CD, not edited manually in the UI:
 
+{% raw %}
 ```python
 # Using grafonnet (Jsonnet library for Grafana)
 # dashboards/api-service.jsonnet
@@ -263,6 +280,7 @@ dashboard.new(
   gridPos={x: 0, y: 0, w: 12, h: 8}
 )
 ```
+{% endraw %}
 
 ---
 
@@ -280,12 +298,14 @@ Metrics are one of three observability pillars. A complete architecture integrat
 
 The power comes from being able to move between pillars seamlessly during investigation:
 
+{% raw %}
 ```
 Alert fires (Metrics) → Drill into error rate by endpoint
   → Jump to logs for that endpoint during the anomaly window
     → Find a specific error with a trace ID
       → Open the trace to see exactly which service call is slow/failing
 ```
+{% endraw %}
 
 In Grafana, this correlation is enabled by:
 1. **Exemplars**: Points on a metric graph that carry a trace ID — click to jump to the trace
@@ -300,6 +320,7 @@ Alert routing — deciding who gets notified about what — is a design problem 
 
 ### AlertManager Routing
 
+{% raw %}
 ```yaml
 # AlertManager config — routes alerts to the right team
 route:
@@ -327,6 +348,7 @@ route:
         team: infrastructure
       receiver: 'infra-team-pagerduty'
 ```
+{% endraw %}
 
 ### Alert Fatigue Prevention
 

@@ -58,6 +58,7 @@ A **synthetic transaction** is an automated probe that simulates a user action a
 **Types of synthetic probes:**
 
 **Ping / availability checks** (Layer 3/4):
+{% raw %}
 ```yaml
 # Prometheus Blackbox Exporter configuration
 modules:
@@ -72,8 +73,10 @@ modules:
       tls_config:
         insecure_skip_verify: false
 ```
+{% endraw %}
 
 **Deep health checks** (Layer 7 — verify actual functionality):
+{% raw %}
 ```yaml
 modules:
   http_api_check:
@@ -89,6 +92,7 @@ modules:
       fail_if_body_not_matches_regexp:
         - '"status":"ok"'
 ```
+{% endraw %}
 
 **End-to-end transaction checks** (Business logic verification):
 These require more investment but provide the highest-fidelity view of user experience:
@@ -107,6 +111,7 @@ The monitoring location matters as much as what you're monitoring:
 
 Synthetic monitoring is the foundation for **user-experience SLIs**:
 
+{% raw %}
 ```yaml
 # SLI: Checkout availability from synthetic probe
 sli:
@@ -119,6 +124,7 @@ sli:
 slo:
   target: 99.9%
 ```
+{% endraw %}
 
 {% include diagram-embed.html
    title="Black Box Monitoring Architecture"
@@ -180,6 +186,7 @@ The most effective monitoring architectures use black box and white box as compl
 
 ### Incident Investigation Flow
 
+{% raw %}
 ```
 Black Box alert fires → "User-visible failure in checkout"
      ↓
@@ -192,6 +199,7 @@ Check white box detail → "CPU spike correlates with Redis connection pool exha
                           → database query queue building up → CPU on API nodes exhausted
                           waiting for blocked connections"
 ```
+{% endraw %}
 
 {% include diagram-embed.html
    title="Black Box vs White Box — Incident Investigation"
@@ -225,6 +233,7 @@ A category that falls between black box and white box: monitoring of infrastruct
 ### TLS Certificate Expiration
 
 One of the most preventable causes of user-visible outages:
+{% raw %}
 ```prometheus
 # Alert: certificate expiring in less than 30 days
 # Blackbox exporter provides this metric automatically
@@ -236,10 +245,12 @@ ALERT TLSCertExpiringIn30Days
     description = "Certificate for {{ $labels.instance }} expires in {{ $value | humanizeDuration }}"
   }
 ```
+{% endraw %}
 
 ### DNS Record Validation
 
 Verify that DNS records resolve to expected values:
+{% raw %}
 ```yaml
 # Blackbox exporter DNS probe
 modules:
@@ -252,6 +263,7 @@ modules:
         fail_if_not_matches_regexp:
           - "10\\.0\\..*"
 ```
+{% endraw %}
 
 {% include tool-embed.html
    title="Monitoring Coverage Gap Analyzer"
