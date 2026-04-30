@@ -20,8 +20,8 @@ objectives:
   - "Make data-driven infrastructure investment decisions using reliability cost modeling"
 prev_lesson: /modules/module-2/2-7-slo-governance/
 prev_title: "SLO Governance & Organizational Maturity"
-next_lesson: /modules/module-1/1-1-monitoring-taxonomies/
-next_title: "Continue to Module 3"
+next_lesson: /modules/module-3/3-1-multi-window-aggregation/
+next_title: "Multi-Window Aggregation & Seasonal Patterns"
 ---
 
 ## The Capacity-Reliability Connection

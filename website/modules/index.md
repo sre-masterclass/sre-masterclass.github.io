@@ -10,7 +10,7 @@ no_sidebar: true
   <div class="lesson-header" style="border-bottom: none; padding-bottom: 0;">
     <h1 style="font-size: 2.5rem; margin-bottom: 12px;">Course Map</h1>
     <p class="text-muted" style="font-size: 1.05rem;">
-      Three complete modules, 17 lessons, and 11 interactive tools.
+      Six complete modules, 26 lessons, and 13 interactive tools.
       Start at the beginning or jump to any lesson — the sidebar keeps you oriented.
     </p>
   </div>
@@ -68,6 +68,54 @@ no_sidebar: true
       <li><a href="/modules/module-2/2-6-alerting-strategy/">2.6 — Alerting Strategy &amp; Burn Rate Implementation</a></li>
       <li><a href="/modules/module-2/2-7-slo-governance/">2.7 — SLO Governance &amp; Organizational Maturity</a></li>
       <li><a href="/modules/module-2/2-8-capacity-planning/">2.8 — Capacity Planning with SLO Integration</a></li>
+    </ul>
+  </div>
+
+  <!-- Module 3 -->
+  <div class="module-card" style="border-left: 4px solid #f59e0b;">
+    <div class="module-card-header">
+      <span class="module-icon">🔬</span>
+      <div>
+        <h2 style="color: #f59e0b;">Module 3: Advanced Monitoring</h2>
+        <p>Multi-window analysis, anomaly detection, and predictive capacity modeling.</p>
+      </div>
+    </div>
+    <ul class="module-lesson-list">
+      <li><a href="/modules/module-3/3-1-multi-window-aggregation/">3.1 — Multi-Window Aggregation &amp; Seasonal Patterns</a></li>
+      <li><a href="/modules/module-3/3-2-anomaly-detection/">3.2 — Anomaly Detection &amp; the SAFE Methodology</a></li>
+      <li><a href="/modules/module-3/3-3-capacity-modeling/">3.3 — Capacity Modeling &amp; Predictive Monitoring</a></li>
+    </ul>
+  </div>
+
+  <!-- Module 4 -->
+  <div class="module-card" style="border-left: 4px solid #ef4444;">
+    <div class="module-card-header">
+      <span class="module-icon">🚨</span>
+      <div>
+        <h2 style="color: #ef4444;">Module 4: Incident Response &amp; Operations</h2>
+        <p>Alerting design, incident response workflows, and chaos engineering practice.</p>
+      </div>
+    </div>
+    <ul class="module-lesson-list">
+      <li><a href="/modules/module-4/4-1-proactive-alerting/">4.1 — Proactive Alerting Design</a></li>
+      <li><a href="/modules/module-4/4-2-incident-response/">4.2 — Incident Response Workflows &amp; Root Cause Analysis</a></li>
+      <li><a href="/modules/module-4/4-3-chaos-engineering/">4.3 — Chaos Engineering &amp; Operational Validation</a></li>
+    </ul>
+  </div>
+
+  <!-- Module 5 -->
+  <div class="module-card" style="border-left: 4px solid #6366f1;">
+    <div class="module-card-header">
+      <span class="module-icon">🚀</span>
+      <div>
+        <h2 style="color: #6366f1;">Module 5: SRE in CI/CD</h2>
+        <p>Integrate SRE practice directly into the delivery pipeline.</p>
+      </div>
+    </div>
+    <ul class="module-lesson-list">
+      <li><a href="/modules/module-5/5-1-deployment-automation/">5.1 — Deployment Automation &amp; Progressive Delivery</a></li>
+      <li><a href="/modules/module-5/5-2-slo-deployment-gates/">5.2 — SLO-Based Deployment Gates</a></li>
+      <li><a href="/modules/module-5/5-3-chaos-integration/">5.3 — Chaos Engineering Integration in CI/CD</a></li>
     </ul>
   </div>
 

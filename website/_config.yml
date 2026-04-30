@@ -99,6 +99,54 @@ course_modules:
         title: "Capacity Planning with SLO Integration"
         slug: 2-8-capacity-planning
 
+  - id: module-3
+    title: "Advanced Monitoring"
+    slug: module-3
+    color: "#f59e0b"
+    icon: "🔬"
+    lessons:
+      - id: 3-1
+        title: "Multi-Window Aggregation & Seasonal Patterns"
+        slug: 3-1-multi-window-aggregation
+      - id: 3-2
+        title: "Anomaly Detection & the SAFE Methodology"
+        slug: 3-2-anomaly-detection
+      - id: 3-3
+        title: "Capacity Modeling & Predictive Monitoring"
+        slug: 3-3-capacity-modeling
+
+  - id: module-4
+    title: "Incident Response & Operations"
+    slug: module-4
+    color: "#ef4444"
+    icon: "🚨"
+    lessons:
+      - id: 4-1
+        title: "Proactive Alerting Design"
+        slug: 4-1-proactive-alerting
+      - id: 4-2
+        title: "Incident Response Workflows & Root Cause Analysis"
+        slug: 4-2-incident-response
+      - id: 4-3
+        title: "Chaos Engineering & Operational Validation"
+        slug: 4-3-chaos-engineering
+
+  - id: module-5
+    title: "SRE in CI/CD"
+    slug: module-5
+    color: "#6366f1"
+    icon: "🚀"
+    lessons:
+      - id: 5-1
+        title: "Deployment Automation & Progressive Delivery"
+        slug: 5-1-deployment-automation
+      - id: 5-2
+        title: "SLO-Based Deployment Gates"
+        slug: 5-2-slo-deployment-gates
+      - id: 5-3
+        title: "Chaos Engineering Integration in CI/CD"
+        slug: 5-3-chaos-integration
+
 # Exclude from build
 exclude:
   - Gemfile
