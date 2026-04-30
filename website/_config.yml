@@ -11,6 +11,12 @@ author:
   name: "SRE Masterclass"
   email: ""
 
+# Community / Support links — used by nav, footer, and landing page
+support:
+  buy_me_a_coffee: "https://buymeacoffee.com/sre.masterclass"
+  github_repo: "https://github.com/sre-masterclass/sre-masterclass.github.io"
+  github_issues: "https://github.com/sre-masterclass/sre-masterclass.github.io/issues"
+
 # Build settings
 markdown: kramdown
 highlighter: rouge

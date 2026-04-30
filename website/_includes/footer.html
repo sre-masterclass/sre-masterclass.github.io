@@ -2,9 +2,27 @@
   <nav class="footer-links" aria-label="Footer navigation">
     <a href="{{ '/' | relative_url }}">Home</a>
     <a href="{{ '/modules/' | relative_url }}">Course Map</a>
-    <a href="https://github.com/sre-masterclass" target="_blank" rel="noopener noreferrer">GitHub</a>
+    <a href="{{ site.support.github_repo | default: 'https://github.com/sre-masterclass' }}"
+       target="_blank" rel="noopener noreferrer">GitHub</a>
+    <a href="{{ site.support.github_issues | default: 'https://github.com/sre-masterclass/sre-masterclass.github.io/issues' }}"
+       target="_blank" rel="noopener noreferrer">🐛 Report an Issue</a>
   </nav>
-  <p>
+
+  {% if site.support.buy_me_a_coffee %}
+  <div class="footer-support">
+    <p class="footer-support-text">
+      Enjoying the course? Help keep it free and growing.
+    </p>
+    <a href="{{ site.support.buy_me_a_coffee }}"
+       target="_blank" rel="noopener noreferrer"
+       class="btn-coffee"
+       aria-label="Support the SRE Masterclass on Buy Me a Coffee">
+      ☕ Buy me a coffee
+    </a>
+  </div>
+  {% endif %}
+
+  <p class="footer-copy">
     &copy; {{ 'now' | date: "%Y" }} SRE Masterclass &mdash;
     Hands-on Site Reliability Engineering education.
     Built with ❤️ for the SRE community.
