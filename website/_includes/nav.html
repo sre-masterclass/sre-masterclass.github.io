@@ -11,11 +11,25 @@
     <li><a href="{{ '/modules/module-0/' | relative_url }}">Module 0</a></li>
     <li><a href="{{ '/modules/module-1/' | relative_url }}">Module 1</a></li>
     <li><a href="{{ '/modules/module-2/' | relative_url }}">Module 2</a></li>
+    <li><a href="{{ '/modules/module-3/' | relative_url }}">Module 3</a></li>
+    <li><a href="{{ '/modules/module-4/' | relative_url }}">Module 4</a></li>
+    <li><a href="{{ '/modules/module-5/' | relative_url }}">Module 5</a></li>
     <li>
       <a href="{{ '/modules/module-0/0-1-business-value/' | relative_url }}" class="topnav-cta">
         Start Learning →
       </a>
     </li>
+    {% if site.support.buy_me_a_coffee %}
+    <li>
+      <a href="{{ site.support.buy_me_a_coffee }}"
+         target="_blank" rel="noopener noreferrer"
+         class="topnav-coffee"
+         title="Support the SRE Masterclass"
+         aria-label="Buy Me a Coffee — support the SRE Masterclass">
+        ☕
+      </a>
+    </li>
+    {% endif %}
   </ul>
 
   <!-- Mobile hamburger -->

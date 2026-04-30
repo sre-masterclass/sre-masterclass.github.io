@@ -22,11 +22,11 @@ description: "Master Site Reliability Engineering through hands-on interactive t
 
   <div class="hero-stats">
     <div class="hero-stat">
-      <div class="number">17+</div>
+      <div class="number">26</div>
       <div class="label">Lessons</div>
     </div>
     <div class="hero-stat">
-      <div class="number">11</div>
+      <div class="number">13</div>
       <div class="label">Interactive Tools</div>
     </div>
     <div class="hero-stat">
@@ -34,8 +34,8 @@ description: "Master Site Reliability Engineering through hands-on interactive t
       <div class="label">Visual Diagrams</div>
     </div>
     <div class="hero-stat">
-      <div class="number">3</div>
-      <div class="label">Core Modules</div>
+      <div class="number">6</div>
+      <div class="label">Complete Modules</div>
     </div>
   </div>
 </section>
@@ -105,7 +105,8 @@ description: "Master Site Reliability Engineering through hands-on interactive t
   <div class="modules-section-inner">
     <h2>What you'll learn</h2>
     <p class="section-subtitle">
-      Three complete modules covering the full SRE knowledge stack — available now.
+      Six complete modules covering the full SRE knowledge stack — from strategic
+      foundation to CI/CD integration. All available now.
     </p>
 
     <div class="modules-grid">
@@ -144,6 +145,42 @@ description: "Master Site Reliability Engineering through hands-on interactive t
           SLO governance frameworks.
         </p>
         <div class="module-lesson-count">8 lessons &nbsp;·&nbsp; 4 interactive tools</div>
+      </a>
+
+      <a href="/modules/module-3/" class="module-overview-card"
+         style="--module-color: #f59e0b;">
+        <div class="module-number">🔬 Module 3</div>
+        <h3>Advanced Monitoring</h3>
+        <p class="module-desc">
+          Multi-window aggregation, the SAFE anomaly-detection methodology,
+          and predictive capacity modeling — the techniques that surface
+          problems before customers do.
+        </p>
+        <div class="module-lesson-count">3 lessons &nbsp;·&nbsp; 3 interactive tools</div>
+      </a>
+
+      <a href="/modules/module-4/" class="module-overview-card"
+         style="--module-color: #ef4444;">
+        <div class="module-number">🚨 Module 4</div>
+        <h3>Incident Response &amp; Operations</h3>
+        <p class="module-desc">
+          Proactive alerting that doesn't drown in noise, the complete
+          incident lifecycle, root-cause analysis techniques, and chaos
+          engineering with bounded blast radius.
+        </p>
+        <div class="module-lesson-count">3 lessons &nbsp;·&nbsp; 3 interactive tools</div>
+      </a>
+
+      <a href="/modules/module-5/" class="module-overview-card"
+         style="--module-color: #6366f1;">
+        <div class="module-number">🚀 Module 5</div>
+        <h3>SRE in CI/CD</h3>
+        <p class="module-desc">
+          Canary deployment patterns, SLO-based deployment gates, and chaos
+          engineering integrated into the pipeline — making reliability the
+          way you ship, not a thing you check after.
+        </p>
+        <div class="module-lesson-count">3 lessons &nbsp;·&nbsp; 2 interactive tools</div>
       </a>
 
     </div>
@@ -203,15 +240,65 @@ description: "Master Site Reliability Engineering through hands-on interactive t
     Ready to think like a senior SRE?
   </h1>
   <p>
-    Start with Module 0 to build the strategic foundation, or jump into
-    Module 1 for the technical deep-dive on monitoring.
+    Start at the beginning with Module 0 for the strategic foundation,
+    jump to Module 2 for SLO mastery, or skip ahead to Module 5 to
+    integrate SRE practice into your CI/CD pipeline.
   </p>
   <div class="hero-cta-group">
     <a href="/modules/module-0/0-1-business-value/" class="btn btn-primary">
       Begin with Module 0 →
     </a>
-    <a href="/modules/module-1/1-1-monitoring-taxonomies/" class="btn btn-secondary">
-      Jump to Monitoring →
+    <a href="/modules/module-2/2-1-slo-definition/" class="btn btn-secondary">
+      Jump to SLOs →
     </a>
+    <a href="/modules/module-5/5-1-deployment-automation/" class="btn btn-secondary">
+      Skip to CI/CD →
+    </a>
+  </div>
+</section>
+
+<!-- ── Support / Community ──────────────────────────────────── -->
+<section class="support-section" aria-labelledby="support-heading">
+  <div class="support-section-inner">
+    <h2 id="support-heading">Support the project</h2>
+    <p class="section-subtitle">
+      The SRE Masterclass is — and will always be — completely free and open source.
+      If it's helped you, here are two ways to give back.
+    </p>
+
+    <div class="support-grid">
+      <div class="support-card">
+        <div class="support-icon">☕</div>
+        <h3>Buy me a coffee</h3>
+        <p>
+          Every coffee directly funds new lessons, interactive tools,
+          and infrastructure costs. Even a single tip means a lot.
+        </p>
+        {% if site.support.buy_me_a_coffee %}
+        <a href="{{ site.support.buy_me_a_coffee }}"
+           target="_blank" rel="noopener noreferrer"
+           class="btn-coffee btn-coffee-large">
+          ☕ Buy me a coffee
+        </a>
+        {% endif %}
+      </div>
+
+      <div class="support-card">
+        <div class="support-icon">🐛</div>
+        <h3>Found a bug or have feedback?</h3>
+        <p>
+          Spotted a typo, broken tool, or unclear explanation?
+          Open an issue on GitHub — every report makes the course better
+          for the next learner.
+        </p>
+        {% if site.support.github_issues %}
+        <a href="{{ site.support.github_issues }}"
+           target="_blank" rel="noopener noreferrer"
+           class="btn btn-issue">
+          🐛 Report an issue →
+        </a>
+        {% endif %}
+      </div>
+    </div>
   </div>
 </section>
